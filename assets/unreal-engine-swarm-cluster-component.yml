@@ -1,0 +1,48 @@
+name: InstallUE4Swarm
+description: This component installs UE4 Swarm from S3 archive and also installs all prerequirements for a build.
+schemaVersion: 1.0
+
+phases:
+  - name: build
+    steps:
+      - name: CreateTempFolder
+        action: CreateFolder
+        inputs:
+          - path: C:\ue4-swarm-temp
+      - name: DownloadDependencies
+        action: S3Download
+        maxAttempts: 3
+        inputs:
+          - source: s3://S3-BUCKET-NAME/ue4-swarm-archive.zip
+            destination: C:\ue4-swarm-temp\ue4-swarm-archive.zip
+      - name: CreateSwarmFolder
+        action: CreateFolder
+        inputs:
+          - path: C:\ue4-swarm
+      - name: UncompressSwarmFiles
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - Expand-Archive -LiteralPath C:\ue4-swarm-temp\ue4-swarm-archive.zip -DestinationPath C:\ue4-swarm
+      - name: DeleteTempFolder
+        action: DeleteFolder
+        inputs:
+          - path: C:\ue4-swarm-temp
+            force: true
+      - name: InstallDotNet
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - Install-WindowsFeature Net-Framework-Core
+      - name: InstallPreReqs
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - Start-Process -Wait -FilePath "C:\ue4-swarm\UE4PrereqSetup_x64.exe" -ArgumentList "/install /quiet"
+      - name: OpenFirewall
+        action: ExecutePowerShell
+        inputs:
+          commands:
+            - New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
+            - New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
+            - New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4

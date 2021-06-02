@@ -1,0 +1,287 @@
+Resources:
+  VirutalWorkstationInstanceRole2E55B929:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action: s3:GetObject
+                Effect: Allow
+                Resource: arn:aws:s3:::ec2-windows-nvidia-drivers/*
+            Version: "2012-10-17"
+          PolicyName: "0"
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/VirutalWorkstationInstanceRole/Resource
+  VirutalWorkstationInstanceRoleDefaultPolicy687E981D:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+            Effect: Allow
+            Resource:
+              Ref: VirtualWorkstationPassword67EF7BF5
+        Version: "2012-10-17"
+      PolicyName: VirutalWorkstationInstanceRoleDefaultPolicy687E981D
+      Roles:
+        - Ref: VirutalWorkstationInstanceRole2E55B929
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/VirutalWorkstationInstanceRole/DefaultPolicy/Resource
+  VirtualWorkstationPassword67EF7BF5:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString: {}
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/Virtual Workstation Password/Resource
+  VirtualWorkstationSecurityGroup659745E6:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows remote access to the Virtual Workstation via RDP & Parsec, Teradici and NICE DCV. In addition allows UE4 Swarm communication
+      GroupName: Virtual-Workstation-SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      SecurityGroupIngress:
+        - CidrIp: 10.0.0.0/8
+          Description: Allow Trusted IP Swarm TCP
+          FromPort: 8008
+          IpProtocol: tcp
+          ToPort: 8009
+        - CidrIp: 10.0.0.0/8
+          Description: Allow Trusted IP Swarm ICMP Ping
+          FromPort: 8
+          IpProtocol: icmp
+          ToPort: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow Trusted Remote CIDR to access Virtual Workstation via RDP
+          FromPort: 3389
+          IpProtocol: tcp
+          ToPort: 3389
+        - CidrIp: 0.0.0.0/0
+          Description: Allow Trusted Remote CIDR to access Virtual Workstation via Parsec
+          FromPort: 1666
+          IpProtocol: tcp
+          ToPort: 1666
+        - CidrIp: 0.0.0.0/0
+          Description: Allow Trusted Remote CIDR to access Virtual Workstation via PCoIP (Session Establishment)
+          FromPort: 4172
+          IpProtocol: tcp
+          ToPort: 4172
+        - CidrIp: 0.0.0.0/0
+          Description: Allow Trusted Remote CIDR to access Virtual Workstation via PCoIP (Client Authentication)
+          FromPort: 443
+          IpProtocol: tcp
+          ToPort: 443
+        - CidrIp: 0.0.0.0/0
+          Description: Allow Trusted Remote CIDR to access Virtual Workstation via PCoIP (PCoIP Session Data)
+          FromPort: 4172
+          IpProtocol: udp
+          ToPort: 4172
+        - CidrIp: 0.0.0.0/0
+          Description: Allow Trusted Remote CIDR to access Virtual Workstation via NICE DCV
+          FromPort: 8443
+          IpProtocol: tcp
+          ToPort: 8443
+      VpcId:
+        Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCB9E5F0B4BD23A326
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/Virtual-Workstation-SecurityGroup/Resource
+  VirtualWorkstationInstanceProfile509990D1:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: VirutalWorkstationInstanceRole2E55B929
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/Virtual Workstation/InstanceProfile
+  VirtualWorkstation431834E1:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 200
+      IamInstanceProfile:
+        Ref: VirtualWorkstationInstanceProfile509990D1
+      ImageId:
+        Ref: SsmParameterValueawsserviceamiwindowslatestWindowsServer2019EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter
+      InstanceType: g4dn.4xlarge
+      SecurityGroupIds:
+        - Fn::GetAtt:
+            - VirtualWorkstationSecurityGroup659745E6
+            - GroupId
+      SubnetId:
+        Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B
+      Tags:
+        - Key: Name
+          Value: gpic-pipeline-virtual-workstation/Virtual Workstation
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ""
+            - - >-
+                <powershell>
+
+                ## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+                ## SPDX-License-Identifier: MIT-0
+
+
+                # Set Windows Administrator password
+
+
+                $admin_password = Get-SECSecretValue 
+              - Ref: VirtualWorkstationPassword67EF7BF5
+              - >-2
+                 | % { Echo $_.SecretString} | ConvertTo-SecureString -AsPlainText -Force
+
+                Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $admin_password
+
+
+                # Setup Windows Firewall rules
+
+
+                #Parsec
+
+                New-NetFirewallRule -DisplayName 'Allow Parsec' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 1666
+
+
+                #PCoIP
+
+                New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 4172
+
+
+                New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 4172
+
+
+                New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 443
+
+
+                # NICE DCV
+
+                New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8443
+
+
+                # Allow Unreal Engine Swarm coomunication
+
+                New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
+
+                New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
+
+                New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4
+
+
+                # Install NVIDIA Grid driver
+
+
+                $Bucket = "ec2-windows-nvidia-drivers"
+
+                $KeyPrefix = "latest"
+
+                $LocalPath = "c:\nvidia-temp"
+
+                $Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1
+
+                foreach ($Object in $Objects) {
+                    $LocalFileName = $Object.Key
+                    if ($LocalFileName -ne '' -and $Object.Size -ne 0) {
+                        $LocalFilePath = Join-Path $LocalPath $LocalFileName
+                        Copy-S3Object -BucketName $Bucket -Key $Object.Key -LocalFile $LocalFilePath -Region us-east-1
+                    }
+                }
+
+
+
+                $nvidia_setup = Get-ChildItem -Path $LocalPath -Filter *server2019*.exe -Recurse -ErrorAction SilentlyContinue -Force | %{$_.FullName} 
+
+
+
+                & $nvidia_setup -s | Out-Null
+
+
+                New-ItemProperty -Path "HKLM:\SOFTWARE\NVIDIA Corporation\Global\GridLicensing" -Name "NvCplDisableManageLicensePage" -PropertyType "DWord" -Value "1"
+
+
+                Remove-Item $LocalPath -Recurse
+
+
+
+                # Install .NET Core Framework
+
+                Install-WindowsFeature Net-Framework-Core
+
+
+                </powershell>
+    DependsOn:
+      - VirutalWorkstationInstanceRoleDefaultPolicy687E981D
+      - VirutalWorkstationInstanceRole2E55B929
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/Virtual Workstation/Resource
+  VirtualWorkstationEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId:
+        Ref: VirtualWorkstation431834E1
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/VirtualWorkstationEIP
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.91.0,@aws-cdk/assets=1.92.0,@aws-cdk/aws-applicationautoscaling=1.92.0,@aws-cdk/aws-autoscaling=1.92.0,@aws-cdk/aws-autoscaling-common=1.92.0,@aws-cdk/aws-certificatemanager=1.92.0,@aws-cdk/aws-cloudformation=1.92.0,@aws-cdk/aws-cloudwatch=1.92.0,@aws-cdk/aws-codeguruprofiler=1.92.0,@aws-cdk/aws-ec2=1.92.0,@aws-cdk/aws-ecr=1.92.0,@aws-cdk/aws-ecr-assets=1.92.0,@aws-cdk/aws-efs=1.92.0,@aws-cdk/aws-elasticloadbalancing=1.92.0,@aws-cdk/aws-elasticloadbalancingv2=1.92.0,@aws-cdk/aws-events=1.92.0,@aws-cdk/aws-iam=1.92.0,@aws-cdk/aws-imagebuilder=1.92.0,@aws-cdk/aws-kms=1.92.0,@aws-cdk/aws-lambda=1.92.0,@aws-cdk/aws-logs=1.92.0,@aws-cdk/aws-route53=1.92.0,@aws-cdk/aws-s3=1.92.0,@aws-cdk/aws-s3-assets=1.92.0,@aws-cdk/aws-sam=1.92.0,@aws-cdk/aws-secretsmanager=1.92.0,@aws-cdk/aws-signer=1.92.0,@aws-cdk/aws-sns=1.92.0,@aws-cdk/aws-sqs=1.92.0,@aws-cdk/aws-ssm=1.92.0,@aws-cdk/cloud-assembly-schema=1.92.0,@aws-cdk/core=1.92.0,@aws-cdk/custom-resources=1.92.0,@aws-cdk/cx-api=1.92.0,@aws-cdk/region-info=1.92.0,jsii-runtime=Python/3.9.5
+    Metadata:
+      aws:cdk:path: gpic-pipeline-virtual-workstation/CDKMetadata/Default
+Parameters:
+  SsmParameterValueawsserviceamiwindowslatestWindowsServer2019EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+Outputs:
+  VirtualWorkstationPublicIp:
+    Description: The public IP of the virtual Workstation
+    Value:
+      Fn::GetAtt:
+        - VirtualWorkstation431834E1
+        - PublicIp
+  VirtualWorkstationSecretName:
+    Description: The name of secret in the AWS Secrets Manager. Please open the AWS Secrets Manager to retrieve the password for the user 'Administrator'.
+    Value:
+      Fn::Join:
+        - "-"
+        - - Fn::Select:
+              - 0
+              - Fn::Split:
+                  - "-"
+                  - Fn::Select:
+                      - 6
+                      - Fn::Split:
+                          - ":"
+                          - Ref: VirtualWorkstationPassword67EF7BF5
+          - Fn::Select:
+              - 1
+              - Fn::Split:
+                  - "-"
+                  - Fn::Select:
+                      - 6
+                      - Fn::Split:
+                          - ":"
+                          - Ref: VirtualWorkstationPassword67EF7BF5
+

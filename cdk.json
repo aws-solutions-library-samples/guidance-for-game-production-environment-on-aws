@@ -1,0 +1,44 @@
+{
+  "app": "python app.py",
+  "context": {
+    "@aws-cdk/core:enableStackNameDuplicates": "true",
+    "aws-cdk:enableDiffNoFail": "true",
+    "@aws-cdk/core:stackRelativeExports": "true",
+    "@aws-cdk/aws-ecr-assets:dockerIgnoreSupport": true,
+    "@aws-cdk/aws-secretsmanager:parseOwnedSecretName": true,
+    "@aws-cdk/aws-kms:defaultKeyPolicies": true,
+    "@aws-cdk/aws-s3:grantWriteWithoutAcl": true,
+
+    "_comment_foundation_stack": "Foundation Stack",
+    "foundation_vpc_cidr": "10.0.0.0/16",
+
+    "_comment_virtual_workstation_stack": "Virtual Workstation Stack",
+
+    "virtual_workstation_trusted_internal_cidr": "10.0.0.0/8",
+    "virtual_workstation_trusted_remote_cidr": "0.0.0.0/0",
+    "virtual_workstation_instance_type": "g4dn.4xlarge",
+    "virtual_workstation_root_volume_size": 200,
+
+    "_comment_unreal_engine_swarm_cluster_stack": "Unreal Engine 4 Swarm Cluster Stack",
+
+    "unreal_engine_swarm_cluster_trusted_internal_cidr": "10.0.0.0/8",
+    "unreal_engine_swarm_cluster_image_builder_instance_type": "m5.large",
+    "unreal_engine_swarm_cluster_coordinator_instance_type": "t3.large",
+    "unreal_engine_swarm_cluster_agent_instance_type": "c5.4xlarge",
+    "unreal_engine_swarm_cluster_agent_root_volume_size": 100,
+
+    "_comment_perforce_helix_core_stack": "Perforce Helix Core",
+
+    "perforce_trusted_internal_cidr": "10.0.0.0/8",
+    "perforce_server_name": "pvs-aws-01",
+    "perforce_server_id": "master.1",
+    "perforce_server_description": "Master/commit server. The master.1 is the SDP instance name, a data set identifier",
+    "perforce_instance_type": "c5.4xlarge",
+    "perforce_depot_volume_type": "st1",
+    "perforce_depot_volume_size": 1024,
+    "perforce_log_volume_type": "gp2",
+    "perforce_log_volume_size": 128,
+    "perforce_metadata_volume_type": "gp2",
+    "perforce_metadata_volume_size": 64
+  }
+}
