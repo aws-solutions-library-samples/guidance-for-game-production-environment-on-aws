@@ -4,9 +4,11 @@
 # This PowerShell script creates a Zip archive with all required
 # files for creating UE4 Swarm node and Controller
 
-# Your Unreal Engine 4 root folder
-# Change this according to your location and version
-$ue4root = 'C:\Program Files\Epic Games\UE_4.25'
+# Prompt user to enter the location of Unreal Engine executable
+$ue4root = 'C:\Program Files\Epic Games\UE_4.27'
+do {
+    $ue4root = Read-Host -Prompt 'Input Unreal Engine root directory, for example C:\Program Files\Epic Games\UE_4.27'
+} while (Test-Path $ue4root)
 
 # Where we are going to store the archive into your Documents folder
 $ue4SwarmArchive = "ue4-swarm-archive"
