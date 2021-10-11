@@ -238,7 +238,13 @@ We can collect these prerequisites from the Unreal Engine 4 version you installe
 
 After you have created the `ue4-swarm-archive.zip` -archive you need to upload it into the root directory of the newly created S3 bucket. It will be downloaded from that location and used during the EC2 Image Builder process. The name of the bucket is available as an output called `BucketName` from the `gpic-pipeline-foundation` stack.
 
-With AWS Tools for PowerShell you can use following command:
+With [AWS Tools for PowerShell](https://docs.aws.amazon.com/powershell/latest/reference/index.html) you can use following command to first list buckets and fetch the name of the bucket created by the foundation stack:
+
+```
+Get-S3Bucket
+```
+
+Then write the local file to the specified bucket and key:
 
 ```
 Write-S3Object -BucketName <NAME OF THE S3 BUCKET> -Key ue4-swarm-archive.zip -File ue4-swarm-archive.zip
