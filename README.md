@@ -36,7 +36,7 @@ The CDK (or CloudFormation templates) creates a new AWS Virtual Private Cloud (V
 Additionally you can add on other solutions from partners such as [Epic Games](https://partners.amazonaws.com/partners/0010h00001ffwqNAAQ/), [Teradici](https://www.teradici.com/aws), [Parsec](https://aws.amazon.com/marketplace/seller-profile?id=2da5e545-e16e-4240-895a-4bbc4a056fbf), and [Incredibuild](https://www.incredibuild.com/partners/aws). These partner solutions further accelerate your development with:
 * [Epic Games' Unreal Engine virtual workstation on AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-msjqifbggkooa)
 * [Teradici and Unreal Engine integrated virtual workstation on AWS Marketplace](https://connect.teradici.com/blog/teradici-unreal-engine-aws)
-* [Parsec for Teams virtual worksation on AWS Marketplace](https://aws.amazon.com/marketplace/seller-profile?id=2da5e545-e16e-4240-895a-4bbc4a056fbf)
+* [Parsec for Teams virtual workstation on AWS Marketplace](https://aws.amazon.com/marketplace/seller-profile?id=2da5e545-e16e-4240-895a-4bbc4a056fbf)
 * [Incredibuild Cloud managed build acceleration solution](https://www.incredibuild.com/partners/aws)
 
 # Contents
