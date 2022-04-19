@@ -80,12 +80,12 @@ Resources:
   VPCPublicSubnet1NATGatewayE0556630:
     Type: AWS::EC2::NatGateway
     Properties:
+      SubnetId:
+        Ref: VPCPublicSubnet1SubnetB4246D30
       AllocationId:
         Fn::GetAtt:
           - VPCPublicSubnet1EIP6AD938E8
           - AllocationId
-      SubnetId:
-        Ref: VPCPublicSubnet1SubnetB4246D30
       Tags:
         - Key: Name
           Value: gpic-pipeline-foundation/VPC/PublicSubnet1
@@ -260,7 +260,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Modules: aws-cdk=1.91.0,@aws-cdk/assets=1.92.0,@aws-cdk/aws-applicationautoscaling=1.92.0,@aws-cdk/aws-autoscaling=1.92.0,@aws-cdk/aws-autoscaling-common=1.92.0,@aws-cdk/aws-certificatemanager=1.92.0,@aws-cdk/aws-cloudformation=1.92.0,@aws-cdk/aws-cloudwatch=1.92.0,@aws-cdk/aws-codeguruprofiler=1.92.0,@aws-cdk/aws-ec2=1.92.0,@aws-cdk/aws-ecr=1.92.0,@aws-cdk/aws-ecr-assets=1.92.0,@aws-cdk/aws-efs=1.92.0,@aws-cdk/aws-elasticloadbalancing=1.92.0,@aws-cdk/aws-elasticloadbalancingv2=1.92.0,@aws-cdk/aws-events=1.92.0,@aws-cdk/aws-iam=1.92.0,@aws-cdk/aws-imagebuilder=1.92.0,@aws-cdk/aws-kms=1.92.0,@aws-cdk/aws-lambda=1.92.0,@aws-cdk/aws-logs=1.92.0,@aws-cdk/aws-route53=1.92.0,@aws-cdk/aws-s3=1.92.0,@aws-cdk/aws-s3-assets=1.92.0,@aws-cdk/aws-sam=1.92.0,@aws-cdk/aws-secretsmanager=1.92.0,@aws-cdk/aws-signer=1.92.0,@aws-cdk/aws-sns=1.92.0,@aws-cdk/aws-sqs=1.92.0,@aws-cdk/aws-ssm=1.92.0,@aws-cdk/cloud-assembly-schema=1.92.0,@aws-cdk/core=1.92.0,@aws-cdk/custom-resources=1.92.0,@aws-cdk/cx-api=1.92.0,@aws-cdk/region-info=1.92.0,jsii-runtime=Python/3.9.5
+      Analytics: v2:deflate64:H4sIAAAAAAAA/0WPzY7CMAyEn4V7CH8SEreFCiEuEBXEPfUaNRQSlNggFOXdabawPc3n8diyJ3Iyncvx4Ec/wxB+m1EE51HGA2loROFsIM9AosTg2AOK4mz3THemTF83iTwew0zGFUODf82OkkCYyni6Q/ZOqhCKq6uBA1e2y/VUOiY86uqKvd97yxAcGE3G2f9whvVWZdlp2mjCp34J5c2jxX7x1hL6lr+B7pJPtaT21/qGllJKQr2odnY0kws5H1yCMUPPlswNZdnpG4XJLIIyAQAA
     Metadata:
       aws:cdk:path: gpic-pipeline-foundation/CDKMetadata/Default
 Outputs:
@@ -278,11 +278,6 @@ Outputs:
       Ref: VPCPrivateSubnet1Subnet8BCA10E0
     Export:
       Name: gpic-pipeline-foundation:ExportsOutputRefVPCPrivateSubnet1Subnet8BCA10E01F79A1B7
-  ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B:
-    Value:
-      Ref: VPCPublicSubnet1SubnetB4246D30
-    Export:
-      Name: gpic-pipeline-foundation:ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B
   ExportsOutputFnGetAttgpicpipelinebucket6D2579DDArnC5C75313:
     Value:
       Fn::GetAtt:
@@ -290,6 +285,11 @@ Outputs:
         - Arn
     Export:
       Name: gpic-pipeline-foundation:ExportsOutputFnGetAttgpicpipelinebucket6D2579DDArnC5C75313
+  ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B:
+    Value:
+      Ref: VPCPublicSubnet1SubnetB4246D30
+    Export:
+      Name: gpic-pipeline-foundation:ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B
   ExportsOutputRefgpicpipelinebucket6D2579DDA0504931:
     Value:
       Ref: gpicpipelinebucket6D2579DD

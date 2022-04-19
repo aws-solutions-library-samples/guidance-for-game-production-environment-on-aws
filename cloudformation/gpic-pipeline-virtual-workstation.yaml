@@ -21,6 +21,18 @@ Resources:
               - Action: s3:GetObject
                 Effect: Allow
                 Resource: arn:aws:s3:::ec2-windows-nvidia-drivers/*
+              - Action:
+                  - s3:ListAllMyBuckets
+                  - s3:ListBucket
+                Effect: Allow
+                Resource: arn:aws:s3:::*
+              - Action: s3:*Object*
+                Effect: Allow
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputFnGetAttgpicpipelinebucket6D2579DDArnC5C75313
+                      - /*
             Version: "2012-10-17"
           PolicyName: "0"
     Metadata:
@@ -139,69 +151,46 @@ Resources:
         Fn::Base64:
           Fn::Join:
             - ""
-            - - >-
+            - - |-
                 <powershell>
-
                 ## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
                 ## SPDX-License-Identifier: MIT-0
-
 
                 # Set Windows Administrator password
 
-
                 $admin_password = Get-SECSecretValue 
               - Ref: VirtualWorkstationPassword67EF7BF5
-              - >-2
+              - |-2
                  | % { Echo $_.SecretString} | ConvertTo-SecureString -AsPlainText -Force
 
                 Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $admin_password
 
-
                 # Setup Windows Firewall rules
 
-
                 #Parsec
-
                 New-NetFirewallRule -DisplayName 'Allow Parsec' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 1666
 
-
                 #PCoIP
-
                 New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 4172
-
 
                 New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 4172
 
-
                 New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 443
 
-
                 # NICE DCV
-
                 New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8443
 
-
                 # Allow Unreal Engine Swarm coomunication
-
                 New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
-
                 New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
-
                 New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4
-
 
                 # Install NVIDIA Grid driver
 
-
                 $Bucket = "ec2-windows-nvidia-drivers"
-
                 $KeyPrefix = "latest"
-
                 $LocalPath = "c:\nvidia-temp"
-
                 $Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1
-
                 foreach ($Object in $Objects) {
                     $LocalFileName = $Object.Key
                     if ($LocalFileName -ne '' -and $Object.Size -ne 0) {
@@ -211,25 +200,18 @@ Resources:
                 }
 
 
-
                 $nvidia_setup = Get-ChildItem -Path $LocalPath -Filter *server2019*.exe -Recurse -ErrorAction SilentlyContinue -Force | %{$_.FullName} 
-
 
 
                 & $nvidia_setup -s | Out-Null
 
-
                 New-ItemProperty -Path "HKLM:\SOFTWARE\NVIDIA Corporation\Global\GridLicensing" -Name "NvCplDisableManageLicensePage" -PropertyType "DWord" -Value "1"
-
 
                 Remove-Item $LocalPath -Recurse
 
 
-
                 # Install .NET Core Framework
-
                 Install-WindowsFeature Net-Framework-Core
-
 
                 </powershell>
     DependsOn:
@@ -247,7 +229,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Modules: aws-cdk=1.91.0,@aws-cdk/assets=1.92.0,@aws-cdk/aws-applicationautoscaling=1.92.0,@aws-cdk/aws-autoscaling=1.92.0,@aws-cdk/aws-autoscaling-common=1.92.0,@aws-cdk/aws-certificatemanager=1.92.0,@aws-cdk/aws-cloudformation=1.92.0,@aws-cdk/aws-cloudwatch=1.92.0,@aws-cdk/aws-codeguruprofiler=1.92.0,@aws-cdk/aws-ec2=1.92.0,@aws-cdk/aws-ecr=1.92.0,@aws-cdk/aws-ecr-assets=1.92.0,@aws-cdk/aws-efs=1.92.0,@aws-cdk/aws-elasticloadbalancing=1.92.0,@aws-cdk/aws-elasticloadbalancingv2=1.92.0,@aws-cdk/aws-events=1.92.0,@aws-cdk/aws-iam=1.92.0,@aws-cdk/aws-imagebuilder=1.92.0,@aws-cdk/aws-kms=1.92.0,@aws-cdk/aws-lambda=1.92.0,@aws-cdk/aws-logs=1.92.0,@aws-cdk/aws-route53=1.92.0,@aws-cdk/aws-s3=1.92.0,@aws-cdk/aws-s3-assets=1.92.0,@aws-cdk/aws-sam=1.92.0,@aws-cdk/aws-secretsmanager=1.92.0,@aws-cdk/aws-signer=1.92.0,@aws-cdk/aws-sns=1.92.0,@aws-cdk/aws-sqs=1.92.0,@aws-cdk/aws-ssm=1.92.0,@aws-cdk/cloud-assembly-schema=1.92.0,@aws-cdk/core=1.92.0,@aws-cdk/custom-resources=1.92.0,@aws-cdk/cx-api=1.92.0,@aws-cdk/region-info=1.92.0,jsii-runtime=Python/3.9.5
+      Analytics: v2:deflate64:H4sIAAAAAAAA/01OywrCMBD8Fu8x9QGCN6GI9GSoXxDWVaNtUjYbpJT8u01qxdPMzszO7lquNzu5Whz02y/h+ioGcIRyuLCGlyhvVmnSLTKSqNG7QIBJPQfuAovSWc8UgJM2+1GkrsHoVg61a3I+o3KNgT6X/lg1FmgLqMjdTDPuegRC9q22+o40PpLnFJ1YFAibLAcy3J/Ihe7r/glz7f+JxI+VijEK1fPD2WIr93K3eHpjlhQsmxZlPeEHD3gtIBcBAAA=
     Metadata:
       aws:cdk:path: gpic-pipeline-virtual-workstation/CDKMetadata/Default
 Parameters:
