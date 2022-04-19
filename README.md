@@ -5,7 +5,7 @@
 - [Contents](#contents)
 - [Architecture Diagram](#architecture-diagram)
 - [Deployment steps](#deployment-steps)
-  - [Initiate CDK](#initiate-cdk)
+  - [Initiate CDK (Optional)](#initiate-cdk-optional)
   - [Deployment of the Foundations Stack](#deployment-of-the-foundations-stack)
   - [Deployment of the Perforce Helix Core Stack](#deployment-of-the-perforce-helix-core-stack)
   - [Deployment & Setup of the Virtual Workstation Stack](#deployment--setup-of-the-virtual-workstation-stack)
@@ -29,11 +29,15 @@
 
 # Description
 
-This example allows you to quickly evaluate some typical solution areas of a Game Production in the Cloud pipeline (GPIC). Remote workstation, version control and acceleration of computationally expensive process.
+Quickly deploy a Cloud Game Development environment for you and your team, with this AWS Sample. Once deployed, you will have high performance virtaul workstation, central version control system, and acceleration of compute heavy tasks by distributing the work to other machines on demand.
 
-The CDK (or CloudFormation templates) creates a new AWS Virtual Private Cloud (VPC), a Virtual Workstation, a Perforce Helix Core server and an Unreal Engine 4 Swarm Cluster. The latter can be used to accelerate Unreal Engine 4 lighting builds using the vast compute resources available in AWS.
+The CDK (or CloudFormation templates) creates a new AWS Virtual Private Cloud (VPC), a customizable virtual workstation, a [Perforce Helix Core](https://www.perforce.com/solutions/game-development) server, and an [Unreal Engine 4 Swarm](https://docs.unrealengine.com/4.27/en-US/RenderingAndGraphics/Lightmass/UnrealSwarmOverview/) cluster. The latter can be used to accelerate Unreal Engine 4 lighting builds using the vast compute resources available in AWS.
 
-You can also connect your existing local workstation to the HelixCore Perforce Server and the Unreal Engine 4 Swarm Cluster via Site to Site VPN or Client VPN.
+Additionally you can add on other solutions from partners such as [Epic Games](https://partners.amazonaws.com/partners/0010h00001ffwqNAAQ/), [Teradici](https://www.teradici.com/aws), [Parsec](https://aws.amazon.com/marketplace/seller-profile?id=2da5e545-e16e-4240-895a-4bbc4a056fbf), and [Incredibuild](https://www.incredibuild.com/partners/aws). These partner solutions further accelerate your development with:
+* [Epic Games' Unreal Engine virtual workstation on AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-msjqifbggkooa)
+* [Teradici and Unreal Engine integrated virtual workstation on AWS Marketplace](https://connect.teradici.com/blog/teradici-unreal-engine-aws)
+* [Parsec for Teams virtual workstation on AWS Marketplace](https://aws.amazon.com/marketplace/seller-profile?id=2da5e545-e16e-4240-895a-4bbc4a056fbf)
+* [Incredibuild Cloud managed build acceleration solution](https://www.incredibuild.com/partners/aws)
 
 # Contents
 
@@ -45,6 +49,14 @@ This project repository contains:
 - - Setup the Unreal Engine 4 Swarm- coordinator and agents.
 - - Setup the Virtual Workstation
 - **Bash Scripts** to setup a secure Perforce Helix Core Server
+
+You can deploy this multiple ways, with the easist using the [AWS CloudFormation](https://aws.amazon.com/cloudformation/) web interface to deploy the following CloudFormation stacks from the `cloudformation` folder in this repository:
+* `cloudformation/gpic-pipeline-foundation.yaml`
+* `cloudformation/gpic-pipeline-perforce-helix-core.yaml`
+* `cloudformation/gpic-pipeline-virtual-workstation.yaml`
+* `cloudformation/gpic-pipeline-swarm-cluster.yaml`
+
+Download these four files locally and follow the instructions below, only using the AWS CDK or AWS CLI as described below if you are familiar with that process.
 
 # Architecture Diagram
 
@@ -64,9 +76,9 @@ The last step is the deployment of the _gpic-pipeline-swarm-cluster_ stack, whic
 
 For the best possible experience, we recommend to deploy this example in the AWS region closest to you.
 
-## Initiate CDK
+## Initiate CDK (Optional)
 
-> This step is optional if you decide to use the CloudFormation templates in the `cloudformation` -directory.
+> This step is optional if you decide to use the CloudFormation tempaltes in the `cloudformation` directory, which is recommended for most users.
 
 This project uses a standard Python CDK project to deploy this example. If you don't have CDK installed, please follow the instructions at [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) documentation.
 
@@ -112,7 +124,9 @@ pip install -r requirements.txt
 
 The Foundation stacks deploys an AWS Virtual Private Cloud (VPC) with two public subnets, two private subnets and a NAT Gateway. It also deploys a S3 bucket, which is utilized by the other stacks of this example.
 
-You can deploy this stack with CDK or by using CloudFormation template. By default we will create a VPC with a CIDR prefix of `10.0.0.0/16` and allow traffic to the Virtual Workstation, the Perforce Helix Core Server and the Unreal Engine 4 Swarm coordinator and agents from CIDR Prefix `10.0.0.0/8`. In addition we will allow traffic from the CIDR prefix `0.0.0.0/0.` to the Virtual Workstation for ease of use. These values can be changed by editing the `cdk.json`-file and giving new values for `foundation_vpc_cidr`, `virtual_workstation_trusted_internal_cidr`, `virtual_workstation_trusted_remote_cidr', `unreal_engine_swarm_cluster_trusted_internal_cidr`and`perforce_trusted_internal_cidr`.
+You can use the `cloudformation/gpic-pipeline-foundation.yaml` template to create a CloudFormation stack called `gpic-pipeline-foundation` using the AWS Console and AWS CLI. If you want to customize the VPC CIDR you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
+
+Alternatively can deploy this stack with CDK or by AWS CLI. By default we will create a VPC with a CIDR prefix of `10.0.0.0/16` and allow traffic to the Virtual Workstation, the Perforce Helix Core Server and the Unreal Engine 4 Swarm coordinator and agents from CIDR Prefix `10.0.0.0/8`. In addition we will allow traffic from the CIDR prefix `0.0.0.0/0.` to the Virtual Workstation for ease of use. These values can be changed by editing the `cdk.json`-file and giving new values for `foundation_vpc_cidr`, `virtual_workstation_trusted_internal_cidr`, `virtual_workstation_trusted_remote_cidr`, `unreal_engine_swarm_cluster_trusted_internal_cidr` and `perforce_trusted_internal_cidr`.
 
 To deploy the foundation stack please run the following command:
 
@@ -120,9 +134,7 @@ To deploy the foundation stack please run the following command:
 cdk deploy gpic-pipeline-foundation
 ```
 
-Alternatively you can use the `cloudformation/gpic-pipeline-foundation.yaml` template to create a CloudFormation stack called `gpic-pipeline-foundation` using the AWS Console and AWS CLI. If you want to customize the VPC CIDR you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
-
-CLI example:
+CLI deployment command:
 
 ```
 aws cloudformation create-stack --stack-name gpic-pipeline-foundation --template-body file://cloudformation/gpic-pipeline-foundation.yaml
@@ -134,15 +146,17 @@ Once the creation of resources is ready you can move to [next step](#deployment-
 
 The Perforce Helix Core stack deploys an EC2 instance based on the latest Amazon Linux 2 AMI into one of the private subnets and setup the Perfore Helix Core daemon using [Perforce Helix Server Deployment Package (SDP)](https://swarm.workshop.perforce.com/projects/perforce-software-sdp/view/main/doc/SDP_Guide.Unix.pdf). In the default configuration access to this machine is only allowed by the CIDR prefix `10.0.0.0/8` on port 1666. These CIDR prefix can be changed by editing the `cdk.json` and mofifying the value of `perforce_trusted_internal_cidr`.
 
-To deploy the Perforce Helix Core stack please run the following command:
+To deploy the Perforce Helix Core stack you can use the `cloudformation/gpic-pipeline-perforce-helix-core.yaml` template to create a CloudFormation stack called `gpic-pipeline-perforce-helix-core` using the AWS Console.
+
+Alternatively you can deploy the Perforce Helix Core stack using AWS CDK with the following command:
 
 ```
 cdk deploy gpic-pipeline-perforce-helix-core
 ```
 
-Alternatively you can use the `cloudformation/gpic-pipeline-perforce-helix-core.yaml` template to create a CloudFormation stack called `gpic-pipeline-perforce-helix-core` using the AWS Console and AWS CLI. If you want to customize the VPC CIDR you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
+  You can also use the AWS CLI. If you want to customize the VPC CIDR you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
 
-CLI example:
+AWS CLI command:
 
 ```
 aws cloudformation create-stack --stack-name gpic-pipeline-perforce-helix-core --template-body file://cloudformation/gpic-pipeline-perforce-helix-core.yaml --capabilities CAPABILITY_NAMED_IAM
@@ -153,6 +167,7 @@ To access the Perforce Helix Core server with the P4/P4V/P4Admin please use the 
 Once the creation of resources is ready you can move to [next step](#deployment--setup-of-the-virtual-workstation-stack).
 
 ## Deployment & Setup of the Virtual Workstation Stack
+This deployment will not only launch a virtual workstation, it will also deploy the necessary security groups and additional AWS infrastructure to use when deploying other workstations from the AWS Marketplace as in the [Description](#description).
 
 ### Deployment of the Virtual Workstation
 
@@ -167,18 +182,20 @@ The Virtual Workstation stack deploys an EC2 Instance based on the latest Micros
   - NICE-DCV
   - Unreal Engine 4 Swarm
 
+You can use the `cloudformation/gpic-pipeline-virtual-workstation.yaml` template to create a CloudFormation stack called `gpic-pipeline-virtual-workstation` using the AWS Console. To customize this workstation further, you will need to use the AWS CDK or AWS CLI. It is recommended to launch this stack with defaults then deploy Marketplace AMIs into the same VPC created in the first stack.
+
 Access to this virtual workstation is controlled by the variables `virtual_workstation_trusted_internal_cidr` and
 `virtual_workstation_trusted_remote_cidr` in `cdk.json`.
 
-To deploy the Virtual Workstation stack please run the following command:
+To deploy the Virtual Workstation stack please via AWS CDK, run the following command:
 
 ```
 cdk deploy gpic-pipeline-virtual-workstation
 ```
 
-Alternatively you can use the `cloudformation/gpic-pipeline-virtual-workstation.yaml` template to create a CloudFormation stack called `gpic-pipeline-virtual-workstation` using the AWS Console and AWS CLI. If you want to customize the trusted CIDR's you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
+If you want to customize the trusted CIDR's you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
 
-CLI example:
+AWS CLI command:
 
 ```
 aws cloudformation create-stack --stack-name gpic-pipeline-virtual-workstation --template-body file://cloudformation/gpic-pipeline-virtual-workstation.yaml --capabilities CAPABILITY_IAM
@@ -186,7 +203,10 @@ aws cloudformation create-stack --stack-name gpic-pipeline-virtual-workstation -
 
 Once the creation of resources is finished you can move to [next step](#setup).
 
-### Setup of the Virtual Workstation
+### Connecting to initial Virtual Workstation
+If you are using a Marketplace AMI, you can go into the AWS Console and terminate the instance that was launched. Follow the documentation for these AMIs on how to connect then continue with the setup instructions in the [next section](setup-of-the-virtual-workstation).
+
+If you are using this initial virtual workstation, you can setup Parsec by connecting initially via Remote Desktop Protocol by doing the following:
 
 To access the Virtual Workstation please use the public IP/DNS, which can be obtained via the Ouput values from CDK/CloudFormation stack or alternatively via the AWS Management Console.
 
@@ -199,6 +219,36 @@ Once you are connected via RDP, please download & install the following software
     - Once the installation is finished, the script will open up an additional Powershell session to update the GPU driver. Please close this Powershell session and don't provide a ACCESS_KEY & SECRET_ACCESS_KEY. We have already-installed the latest NVIDIA Grid driver on the virtual workstation.
     - Close all remaining Powershell sessions
     - Sign-Up for a Parsec account or use an existing Parsec account to login
+
+### Setup of the Virtual Workstation
+
+There are some Windows Firewall rules that need to be added when using some software on an AWS virtual workstation. You can run the below PowerShell commands to add these rules:
+
+Parsec
+
+`New-NetFirewallRule -DisplayName 'Allow Parsec' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 1666`
+
+Teradici CAS
+
+`New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 4172`
+
+`New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 4172`
+
+`New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 443`
+
+NICE DCV
+
+`New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8443`
+
+Unreal Engine Swarm Communication
+
+`New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009`
+
+`New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009`
+
+`New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4`
+
+Below you will find instructions on adding additional software to your virtual workstation:
 - [Perforce Helix](https://www.perforce.com/)
   - Steps:
     - Download and Install the Helix Visual Client (P4V) from [here](https://www.perforce.com/downloads/helix-visual-client-p4v)
@@ -211,12 +261,14 @@ Once you are connected via RDP, please download & install the following software
       - Hit _Install_
       - Uncheck "Start P4V" and hit _Exit_
 - [Unreal Engine 4](https://www.unrealengine.com/en-US/download)
-  - Hints:
+    - If you choose a Marketplace AMI with Unreal Engine already loaded, you can skip this step.
     - You need to Sign-Up for an EPIC account or use your existing one. Alternatively you can clone the Unreal Engine 4 source from Github if you have connected your EPIC Account with your Github account.
+- [Incredibuild Cloud](https://www.incredibuild.com/partners/aws)
+  - Download the Incredibuild AWS Installer Powershell script `incredibuild9-aws-installation.ps1` from the `assets` folder and run on the virtual workstation.
+  - Install Incredibuild Cloud component in Visual Studio.
+  - Follow Incredibuild's instructions to create an account and activate your Incredibuild Cloud cores with the Incredibuild coordinator installed with the above script.
 
-We have chosen Parsec in this example, but feel to install a different remote desktop protocol based on your preference. Other options would be for example [PCoIP from teradici](https://docs.teradici.com/find/product/cloud-access-software/current?subscriptionName=cloud-access) or [NICE DCV](https://download.nice-dcv.com/). We already included the necessary EC2 security group and Windows firewall exceptions for these protocols, so please feel free to use the protocol of your choice.
-
-Once you have finished the installations, please disconnect from the RDP session and connect to the instance using Parsec (or the remote desktop protocol of your choice). Now, start the PV4 application and connect to the Peforce Helix Core server. The password of the user `perforce` can be found in the AWS Secrets Manager.
+Now, start the PV4 application and connect to the Peforce Helix Core server. The password of the user `perforce` can be found in the AWS Secrets Manager.
 
 Once you are done please continue to the [next step](#deployment-of-the-unreal-engine-4-swarm-cluster)
 
@@ -252,13 +304,15 @@ Write-S3Object -BucketName <NAME OF THE S3 BUCKET> -Key ue4-swarm-archive.zip -F
 
 #### Deployment
 
-To deploy the Swarm Cluster you can run following command:
+To deploy the Swarm Cluster you can use the `cloudformation/gpic-pipeline-swarm-cluster.yaml` template to create a CloudFormation stack called `gpic-pipeline-swarm-cluster` using the AWS Web Console.
+
+You can deploy with AWS CDK using the following command:
 
 ```
 cdk deploy gpic-pipeline-swarm-cluster
 ```
 
-Alternatively you can use the `cloudformation/gpic-pipeline-swarm-cluster.yaml` -template to create a CloudFormation stack called `gpic-pipeline-swarm-cluster` using the AWS Console and AWS CLI.
+Alternatively you can use the AWS CLI with this command:
 
 CLI example:
 
@@ -304,7 +358,7 @@ Once this is done start experimenting with your environment. Here are some examp
 
 - Create a streaming depot
 - Create a mainline stream
-- Create additional Perforce user and grant him access to the newly created streaming depot
+- Create additional Perforce user and grant them access to the newly created streaming depot
 - Create a new workspace
 - Create a `.p4ignore` file for your Unreal project, markt it for add and submit it to the mainline stream
 - Set the correct typemap for an Unreal project
@@ -323,7 +377,7 @@ _Please, don't forget stop the resources if you are not working with them, other
 
 # Cleaning Up Resources
 
-To clean up this example you need to delete the CloudFormation stacks. Start by deleting the `gpic-pipeline-virutal-workstation`, followed by the `gpic-pipeline-perforce-helix-core` and `gpic-pipeline-swarm-cluster` stacks. Once all of these stacks are completely removed you can delete the `gpic-pipeline-foundation` stack.
+To clean up this example you need to delete the CloudFormation stacks. Start by deleting the `gpic-pipeline-virutal-workstation`, followed by the `gpic-pipeline-perforce-helix-core` and `gpic-pipeline-swarm-cluster` stacks. Once all of these stacks are completely removed you can delete the `gpic-pipeline-foundation` stack. Additionally terminate any additional workstations launched from the AWS Marketplace.
 
 With CDK you can delete the stacks with:
 Example commands:
