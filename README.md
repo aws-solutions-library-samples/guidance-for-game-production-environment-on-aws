@@ -46,7 +46,7 @@ This project repository contains:
 - **Infrastructure deployment automation** that deploys required infrastructure resources using AWS CDK or AWS CloudFormation.
 - **PowerShell Scripts** that are used to:
 - - Collect dependencies from your Unreal Engine 4 installation
-- - Setup the Unreal Engine 4 Swarm- coordinator and agents.
+- - Setup the Unreal Engine 4 Swarm coordinator and agents.
 - - Setup the Virtual Workstation
 - **Bash Scripts** to setup a secure Perforce Helix Core Server
 
@@ -201,10 +201,10 @@ AWS CLI command:
 aws cloudformation create-stack --stack-name gpic-pipeline-virtual-workstation --template-body file://cloudformation/gpic-pipeline-virtual-workstation.yaml --capabilities CAPABILITY_IAM
 ```
 
-Once the creation of resources is finished you can move to [next step](#setup).
+Once the creation of resources is finished you can move to [next step](#connecting-to-initial-virtual-workstation).
 
 ### Connecting to initial Virtual Workstation
-If you are using a Marketplace AMI, you can go into the AWS Console and terminate the instance that was launched. Follow the documentation for these AMIs on how to connect then continue with the setup instructions in the [next section](setup-of-the-virtual-workstation).
+If you are using a Marketplace AMI, you can go into the AWS Console and terminate the instance that was launched. Follow the documentation for these AMIs on how to connect then continue with the setup instructions in the [next section](#setup-of-the-virtual-workstation).
 
 If you are using this initial virtual workstation, you can setup Parsec by connecting initially via Remote Desktop Protocol by doing the following:
 
@@ -317,7 +317,7 @@ Alternatively you can use the AWS CLI with this command:
 CLI example:
 
 ```
-aws cloudformation create-stack --stack-name gpic-pipeline-swarm-cluster --capabilities CAPABILITY_NAMED_IAM --template-body file://cloudformation/gpic-pipeline-swarm-cluster.yaml --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --stack-name gpic-pipeline-swarm-cluster --template-body file://cloudformation/gpic-pipeline-swarm-cluster.yaml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 This step will take **30 minutes** on average as it's baking the Window AMI for Swarm. The steps to install all dependencies does take some time to complete. While the deployment is running you can read [below](#a-look-behind-the-curtains) for details on what's happening during stack creation.
@@ -347,12 +347,12 @@ The Swarm Agent will also use `User Data` to configure the Windows to start `Swa
 
 Now that the `gpic-pipeline-swarm-cluster.yaml` stack has completed deployment you should see two additional EC2 Instances running in your new VPC. Also the CDK/CloudFormation stack should have outputed the private IP address of the Unreal Engine 4 Swarm Coordinator.
 
-On your Virtual Workstation you have to configure the local Swarm Agent. You can launch it from `C:\Program Files\Epic Games\UE_4.25\Engine\Binaries\DotNET` directory. The Swarm agent can be accessed via the Taskbar (System Tray). After this you will need to configure the following settings:
+On your Virtual Workstation you have to configure the local Swarm Agent. You can launch it from `C:\Program Files\Epic Games\UE_4.27\Engine\Binaries\DotNET` directory. The application can be accessed by double clicking the Swarm Agent icon in the Taskbar (System Tray). After this you will need to configure the following values accessible in the **Settings** tab:
 
 - `AgentGroupName`: `ue4-swarm-aws`
 - `AllowedRemoteAgentGroup`: `ue4-swarm-aws`
 - `AllowedRemoteAgentNames`: `*`
-- `CoordinatorRemotingHost`: `<Add Coordinator private IP>`
+- `CoordinatorRemotingHost`: `<Add coordinator private IP from the Stack output>`
 
 Once this is done start experimenting with your environment. Here are some example tasks that you might want to test:
 
