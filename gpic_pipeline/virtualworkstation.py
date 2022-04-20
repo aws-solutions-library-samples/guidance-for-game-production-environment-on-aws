@@ -11,21 +11,35 @@ from aws_cdk import (
 
 class VirtualWorkstationStack(core.Stack):
 
-  def __init__(self, scope: core.Construct, id: str, vpc, **kwargs) -> None:
+  def __init__(self, scope: core.Construct, id: str, bucket, vpc, **kwargs) -> None:
     super().__init__(scope,id,**kwargs)
 
     
     # Create Virtual Workstation Instance Role
 
     
-    policy_statement = iam.PolicyStatement(
+    policy_statement_drivers = iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             actions=["s3:GetObject",],
             resources=["arn:aws:s3:::ec2-windows-nvidia-drivers/*"]
         )
 
+    policy_statement_bucket_list = iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["s3:ListAllMyBuckets","s3:ListBucket"],
+            resources=["arn:aws:s3:::*"]
+        )
+      
+    policy_statement_bucket_object_actions = iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["s3:*Object*",],
+            resources=[bucket.bucket_arn+ "/*"]
+        )
+
     policy_document = iam.PolicyDocument()
-    policy_document.add_statements(policy_statement)
+    policy_document.add_statements(policy_statement_drivers)
+    policy_document.add_statements(policy_statement_bucket_list)
+    policy_document.add_statements(policy_statement_bucket_object_actions)
 
     # Instance Role and SSM Managed Policy
     role = iam.Role(self, "VirutalWorkstationInstanceRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"), inline_policies=[policy_document])

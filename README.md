@@ -46,7 +46,7 @@ This project repository contains:
 - **Infrastructure deployment automation** that deploys required infrastructure resources using AWS CDK or AWS CloudFormation.
 - **PowerShell Scripts** that are used to:
 - - Collect dependencies from your Unreal Engine 4 installation
-- - Setup the Unreal Engine 4 Swarm- coordinator and agents.
+- - Setup the Unreal Engine 4 Swarm coordinator and agents.
 - - Setup the Virtual Workstation
 - **Bash Scripts** to setup a secure Perforce Helix Core Server
 
@@ -68,9 +68,9 @@ On a high level the deployment is split into four (4) parts.
 
 The first step is to deploy the _gpic-pipeline-foundation_ stack. This will setup a VPC, private- and public -subnets, the network routing and a S3 bucket which is needed in subsequent steps.
 
-The second step is to deploy the _gpic-pipeline-perforce-helix-core_ stack. This will deploy a secure Perforce Helix Core Server into one of the private subnets and configure it according to best-practices. Once this machine is up and running you can connect to it as user `perforce` using P4V/P4/P4Admin. The password for the user `perforce` can be retrieved via the AWS Secrets Manager.
+The second step is to deploy the _gpic-pipeline-perforce-helix-core_ stack. This will deploy a secure Perforce Helix Core Server into one of the private subnets and configure it according to best-practices. Once this machine is up and running you can connect to it as user `perforce` using P4V/P4/P4Admin. The password for the user `perforce` can be retrieved via [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/).
 
-The third step is to deploy the _gpic-pipeline-virtual-workstation_ stack. Once this machine is up and running you can connect to it as user `Administrator` via RDP using the public IP address (or the public DNS name). The password for the user `Administrator` can be retrieved via the AWS Secrets Manager.
+The third step is to deploy the _gpic-pipeline-virtual-workstation_ stack. Once this machine is up and running you can connect to it as user `Administrator` via RDP using the public IP address (or the public DNS name). The password for the user `Administrator` can be retrieved via the [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/).
 
 The last step is the deployment of the _gpic-pipeline-swarm-cluster_ stack, which will deploy a Unreal Engine 4 Swarm Coordinator into one of the private subnets as well as an Amazon EC2 AutoScaling consisting of Unreal Engine 4 Swarm agents.
 
@@ -78,7 +78,7 @@ For the best possible experience, we recommend to deploy this example in the AWS
 
 ## Initiate CDK (Optional)
 
-> This step is optional if you decide to use the CloudFormation tempaltes in the `cloudformation` directory which is recommended for most users.
+> This step is optional if you decide to use the CloudFormation tempaltes in the `cloudformation` directory, which is recommended for most users.
 
 This project uses a standard Python CDK project to deploy this example. If you don't have CDK installed, please follow the instructions at [AWS Cloud Development Kit](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) documentation.
 
@@ -89,13 +89,13 @@ Create a python virtualenv
 MacOS and Linux:
 
 ```
-$ python3 -m venv .venv
+ python3 -m venv .venv
 ```
 
 Windows
 
 ```
-$ python -m venv .venv
+python -m venv .venv
 ```
 
 After the virtualenv is created, you can use the following step to activate your virtualenv.
@@ -103,19 +103,19 @@ After the virtualenv is created, you can use the following step to activate your
 MacOS and Linux:
 
 ```
-$ source .venv/bin/activate
+source .venv/bin/activate
 ```
 
 Windows:
 
 ```
-> source.bat
+source.bat
 ```
 
 Once the virtualenv is activated, you can install the required dependencies.
 
 ```
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 > If you run on a MacOS or Linux, you potentialy need to modify the file `cdk.json` to use the correct python version. This CDK application expects that `python` is a symlink to python3 or the binary for python verions 3.
@@ -131,13 +131,13 @@ Alternatively can deploy this stack with CDK or by AWS CLI. By default we will c
 To deploy the foundation stack please run the following command:
 
 ```
-$ cdk deploy gpic-pipeline-foundation
+cdk deploy gpic-pipeline-foundation
 ```
 
 CLI deployment command:
 
 ```
-$ aws cloudformation create-stack --stack-name gpic-pipeline-foundation --template-body file://cloudformation/gpic-pipeline-foundation.yaml
+aws cloudformation create-stack --stack-name gpic-pipeline-foundation --template-body file://cloudformation/gpic-pipeline-foundation.yaml
 ```
 
 Once the creation of resources is ready you can move to [next step](#deployment-of-the-perforce-helix-core-stack).
@@ -151,7 +151,7 @@ To deploy the Perforce Helix Core stack you can use the `cloudformation/gpic-pip
 Alternatively you can deploy the Perforce Helix Core stack using AWS CDK with the following command:
 
 ```
-$ cdk deploy gpic-pipeline-perforce-helix-core
+cdk deploy gpic-pipeline-perforce-helix-core
 ```
 
   You can also use the AWS CLI. If you want to customize the VPC CIDR you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
@@ -159,7 +159,7 @@ $ cdk deploy gpic-pipeline-perforce-helix-core
 AWS CLI command:
 
 ```
-$ aws cloudformation create-stack --stack-name gpic-pipeline-perforce-helix-core --template-body file://cloudformation/gpic-pipeline-perforce-helix-core.yaml --capabilities CAPABILITY_NAMED_IAM
+aws cloudformation create-stack --stack-name gpic-pipeline-perforce-helix-core --template-body file://cloudformation/gpic-pipeline-perforce-helix-core.yaml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 To access the Perforce Helix Core server with the P4/P4V/P4Admin please use the user `perforce`. The password for this user can be obtained via the AWS Secrets Manager. To accees the server via Secure Shell (SSH), please use the AWS Systems Manager Session Manager.
@@ -169,7 +169,7 @@ Once the creation of resources is ready you can move to [next step](#deployment-
 ## Deployment & Setup of the Virtual Workstation Stack
 This deployment will not only launch a virtual workstation, it will also deploy the necessary security groups and additional AWS infrastructure to use when deploying other workstations from the AWS Marketplace as in the [Description](#description).
 
-### Deployment of the Virtual Workstaticn
+### Deployment of the Virtual Workstation
 
 The Virtual Workstation stack deploys an EC2 Instance based on the latest Microsoft Windows Server 2019 Base AMI in one of the public subnets. In this process we also:
 
@@ -190,7 +190,7 @@ Access to this virtual workstation is controlled by the variables `virtual_works
 To deploy the Virtual Workstation stack please via AWS CDK, run the following command:
 
 ```
-$ cdk deploy gpic-pipeline-virtual-workstation
+cdk deploy gpic-pipeline-virtual-workstation
 ```
 
 If you want to customize the trusted CIDR's you will need to edit the CloudFormation template or use the CDK to synthesize new one with the CDK context variable (see the [Tips](#extra-tips) section).
@@ -198,13 +198,13 @@ If you want to customize the trusted CIDR's you will need to edit the CloudForma
 AWS CLI command:
 
 ```
-$ aws cloudformation create-stack --stack-name gpic-pipeline-virtual-workstation --template-body file://cloudformation/gpic-pipeline-virtual-workstation.yaml --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --stack-name gpic-pipeline-virtual-workstation --template-body file://cloudformation/gpic-pipeline-virtual-workstation.yaml --capabilities CAPABILITY_IAM
 ```
 
-Once the creation of resources is finished you can move to [next step](#setup).
+Once the creation of resources is finished you can move to [next step](#connecting-to-initial-virtual-workstation).
 
 ### Connecting to initial Virtual Workstation
-If you are using a Marketplace AMI, you can go into the AWS Console and terminate the instance that was launched. Follow the documentation for these AMIs on how to connect then continue with the setup instructions in the [next section](setup-of-the-virtual-workstation).
+If you are using a Marketplace AMI, you can go into the AWS Console and terminate the instance that was launched. Follow the documentation for these AMIs on how to connect then continue with the setup instructions in the [next section](#setup-of-the-virtual-workstation).
 
 If you are using this initial virtual workstation, you can setup Parsec by connecting initially via Remote Desktop Protocol by doing the following:
 
@@ -280,9 +280,9 @@ Each Windows instance that will act as a Swarm Coordinator or as a Swarm Agent w
 We can collect these prerequisites from the Unreal Engine 4 version you installed on the Virtual Workstation with the provided `assets/unreal-engine-swarm-create-dependencies-archive.ps1` script in this repository.
 
 - If you are no longer logged into the Virtual Workstation, please login again.
-- Please download the script `unreal-engine-swarm-create-dependencies-archive.ps1` from the assests folder to the virtual workstation
+- Please download the script `unreal-engine-swarm-create-dependencies-archive.ps1` from the `assests` folder to the virtual workstation
 - This PowerShell script will copy all the components that are needed to customize a fresh Window installation
-- The script assumes that your Unreal Engine is installed to `C:\Program Files\Epic Games\UE_4.25` directory but you can customize the script to match your location
+- The script assumes that your Unreal Engine is installed to `C:\Program Files\Epic Games\UE_4.27` directory but you can customize the script to match your location
 - Script will create a compressed archive called `ue4-swarm-archive.zip` under your `My Documents` directory
 - You can find more details about these prerequisites at:
   - [Unreal Engines 4's Hardware and Software requirements](https://docs.unrealengine.com/en-US/GettingStarted/RecommendedSpecifications/index.html) -page
@@ -290,10 +290,16 @@ We can collect these prerequisites from the Unreal Engine 4 version you installe
 
 After you have created the `ue4-swarm-archive.zip` -archive you need to upload it into the root directory of the newly created S3 bucket. It will be downloaded from that location and used during the EC2 Image Builder process. The name of the bucket is available as an output called `BucketName` from the `gpic-pipeline-foundation` stack.
 
-With AWS CLI fro the virtual workstation you can use following command:
+With [AWS Tools for PowerShell](https://docs.aws.amazon.com/powershell/latest/reference/index.html) you can use following command to first list buckets and fetch the name of the bucket created by the foundation stack:
 
 ```
-$ aws s3 cp ue4-swarm-archive.zip s3://<NAME OF THE S3 BUCKET>/
+Get-S3Bucket
+```
+
+Then write the local file to the specified bucket and key:
+
+```
+Write-S3Object -BucketName <NAME OF THE S3 BUCKET> -Key ue4-swarm-archive.zip -File ue4-swarm-archive.zip
 ```
 
 #### Deployment
@@ -303,7 +309,7 @@ To deploy the Swarm Cluster you can use the `cloudformation/gpic-pipeline-swarm-
 You can deploy with AWS CDK using the following command:
 
 ```
-$ cdk deploy gpic-pipeline-swarm-cluster
+cdk deploy gpic-pipeline-swarm-cluster
 ```
 
 Alternatively you can use the AWS CLI with this command:
@@ -311,7 +317,7 @@ Alternatively you can use the AWS CLI with this command:
 CLI example:
 
 ```
-$ aws cloudformation create-stack --stack-name gpic-pipeline-swarm-cluster --capabilities CAPABILITY_NAMED_IAM --template-body file://cloudformation/gpic-pipeline-swarm-cluster.yaml --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --stack-name gpic-pipeline-swarm-cluster --template-body file://cloudformation/gpic-pipeline-swarm-cluster.yaml --capabilities CAPABILITY_NAMED_IAM
 ```
 
 This step will take **30 minutes** on average as it's baking the Window AMI for Swarm. The steps to install all dependencies does take some time to complete. While the deployment is running you can read [below](#a-look-behind-the-curtains) for details on what's happening during stack creation.
@@ -328,25 +334,25 @@ Once the EC2 Image Builder completes it will create a private AMI under your acc
 
 ##### Deploying UE4 Swarm Coordinator
 
-The Swarm Coordinator will be launched as a single EC2 Instance. The launch will use `User Data` to configure the Windows to start SwarmCoordinator.exe on bootup. You can view the contents of the `User Data` in `assets/start-coordinator.ps1` - Powershell script.
+The Swarm Coordinator will be launched as a single EC2 Instance. The launch will use `User Data` to configure the Windows to start `SwarmCoordinator.exe` on bootup. You can view the contents of the `User Data` in `assets/start-coordinator.ps1` - Powershell script.
 
 ##### Deploying UE4 Swarm Agent Auto Scaling Group
 
 The Swarm Agents are going to be launched as Auto Scaling Group. Enabling us to quickly scale the number of nodes up and down. As the Swarm Agents need to be already online and registered when you submit a UE4 build, we can't use any metrics to scale the cluster on demand.
 Instead you can use for example Schedule or some script to scale the cluster before submit a job. With a schedule you could for example configure the cluster to scale up to certain number of nodes in the morning and then after office hours scale the cluster back to zero.
 
-The Swarm Agent will also use `User Data` to configure the Windows to start SwarmAgent.exe on bootup and injects a Swarm configuration file into the Instance. This configuration file will set number of threads to equal amount of CPU Core and also will set the Coordinator IP address. You can view the contents of the `User Data` in `assets/start-agent.ps1` - Powershell script.
+The Swarm Agent will also use `User Data` to configure the Windows to start `SwarmAgent.exe` on bootup and injects a Swarm configuration file into the Instance. This configuration file will set number of threads to equal amount of CPU Core and also will set the Coordinator IP address. You can view the contents of the `User Data` in `assets/start-agent.ps1` - Powershell script.
 
 # Finish
 
-Now that the gpic-pipeline-swarm-cluster stack has completed deployment you should see two additional EC2 Instances running in your new VPC. Also the CDK/CloudFormation stack should have outputed the private IP address of the Unreal Engine 4 Swarm Coordinator.
+Now that the `gpic-pipeline-swarm-cluster.yaml` stack has completed deployment you should see two additional EC2 Instances running in your new VPC. Also the CDK/CloudFormation stack should have outputed the private IP address of the Unreal Engine 4 Swarm Coordinator.
 
-On your Virtual Workstation you have to configure the local Swarm Agent. You can launch it from `C:\Program Files\Epic Games\UE_4.25\Engine\Binaries\DotNET` directory. The Swarm agent can be accessed via the Taskbar (System Tray). After this you will need to configure the following settings:
+On your Virtual Workstation you have to configure the local Swarm Agent. You can launch it from `C:\Program Files\Epic Games\UE_4.27\Engine\Binaries\DotNET` directory. The application can be accessed by double clicking the Swarm Agent icon in the Taskbar (System Tray). After this you will need to configure the following values accessible in the **Settings** tab:
 
 - `AgentGroupName`: `ue4-swarm-aws`
 - `AllowedRemoteAgentGroup`: `ue4-swarm-aws`
 - `AllowedRemoteAgentNames`: `*`
-- `CoordinatorREmoteHost`: `<Add Coordinator private IP>`
+- `CoordinatorRemotingHost`: `<Add coordinator private IP from the Stack output>`
 
 Once this is done start experimenting with your environment. Here are some example tasks that you might want to test:
 
@@ -354,7 +360,7 @@ Once this is done start experimenting with your environment. Here are some examp
 - Create a mainline stream
 - Create additional Perforce user and grant them access to the newly created streaming depot
 - Create a new workspace
-- Create a .p4ignore for your Unreal project, markt it for add and submit it to the mainline stream
+- Create a `.p4ignore` file for your Unreal project, markt it for add and submit it to the mainline stream
 - Set the correct typemap for an Unreal project
 - Start Unreal Engine 4
 - Create a new Unreal project
