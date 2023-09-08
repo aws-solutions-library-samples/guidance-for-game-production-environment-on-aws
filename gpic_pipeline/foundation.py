@@ -31,7 +31,7 @@ class FoundationStack(core.Stack):
             nat_gateways=1,
             max_azs=2,
             subnet_configuration=[ec2.SubnetConfiguration(name="Public",subnet_type=ec2.SubnetType.PUBLIC),
-            ec2.SubnetConfiguration(name="Private",subnet_type=ec2.SubnetType.PRIVATE)]
+            ec2.SubnetConfiguration(name="Private",subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT)]
             )
         
         

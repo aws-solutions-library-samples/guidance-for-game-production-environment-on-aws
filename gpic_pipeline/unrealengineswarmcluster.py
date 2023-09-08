@@ -30,7 +30,7 @@ class UnrealEngineSwarmClusterStack(core.Stack):
         policy_document.add_statements(policy_statement)
 
         # Instance Role and SSM Managed Policy
-        role = iam.Role(self, "SwarmInstanceRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"), inline_policies=[policy_document])
+        role = iam.Role(self, "SwarmInstanceRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"), inline_policies={"GPICDemo_UESwarmAccess":policy_document})
 
         role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2RoleforSSM"))
         role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("EC2InstanceProfileForImageBuilder"))
@@ -38,16 +38,16 @@ class UnrealEngineSwarmClusterStack(core.Stack):
         # Create instance profile that EC2 Image builder can use
         # This can be also later used running Swarm instances
         instanceprofile = iam.CfnInstanceProfile(self, "GpicSwarmInstanceProfile",
-            instance_profile_name="ue4-swarm-instance-profile",
+            instance_profile_name="ue5-swarm-instance-profile",
             path="/executionServiceEC2Role/",
             roles=[role.role_name]
         )
 
         # Security Group for the Swarm instances that allows communication
-        securitygroup = ec2.SecurityGroup(self, "UE4-Swarm-SecurityGroup",
+        securitygroup = ec2.SecurityGroup(self, "UE5-Swarm-SecurityGroup",
             vpc=vpc,
-            description="Security Group for UE4 Swarm Agent and Coordinator",
-            security_group_name="Allow UE4 Swarm communication",
+            description="Security Group for UE5 Swarm Agent and Coordinator",
+            security_group_name="Allow UE5 Swarm communication",
             allow_all_outbound=True
             )
 
@@ -103,12 +103,12 @@ class UnrealEngineSwarmClusterStack(core.Stack):
             data=componentdata
         ) 
 
-        privatesubnets = vpc.select_subnets(subnet_type=ec2.SubnetType.PRIVATE)
+        privatesubnets = vpc.select_subnets(subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT)
 
         # Define the new VPC and Instanceprofile to be used for Image Building
         infraconfig = imagebuilder.CfnInfrastructureConfiguration(self,
             "SwarmInfraConfig",
-            name="GPIC-UE4-Swarm-WindowsServer-2019-Infra-Config",
+            name="GPIC-UE5-Swarm-WindowsServer-2019-Infra-Config",
             instance_profile_name=instanceprofile.instance_profile_name,
             # logging=imagebuilder.CfnInfrastructureConfiguration.S3LogsProperty(s3_bucket_name=bucket.bucket_name),
             subnet_id=privatesubnets.subnets[0].subnet_id,
@@ -125,7 +125,7 @@ class UnrealEngineSwarmClusterStack(core.Stack):
         # Define Image build recipe combinen the Windows image and our Component
         recipe = imagebuilder.CfnImageRecipe(self,
             "ImageRecipe",
-            name="GPIC-UE4-Swarm-Image",
+            name="GPIC-UE5-Swarm-Image",
             parent_image=basewindows.get_image(self).image_id,
             version="1.0.0",
             components=[{"componentArn":swarmcomponent.attr_arn}]
@@ -164,11 +164,11 @@ class UnrealEngineSwarmClusterStack(core.Stack):
 
 
         # Launch the Swarm Coordinator instance
-        coordinator = ec2.Instance(self, "ue4-swarm-coordinator",
+        coordinator = ec2.Instance(self, "ue5-swarm-coordinator",
             instance_type=ec2.InstanceType(coordinator_instance_type),
             machine_image=swarmami,
             vpc = vpc,
-            vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType('PRIVATE')),
+            vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType('PRIVATE_WITH_NAT')),
             role = role,
             security_group=securitygroup,
             user_data=ec2.UserData.custom(coordinator_user_data)
@@ -209,12 +209,12 @@ class UnrealEngineSwarmClusterStack(core.Stack):
         # Create Autoscaling group for Swarm Agents
         # It won't automaticaly scale on load but instead it will automatically
         # Scale down at evening and bring the cluster up again in the morning
-        swarmasg = autoscaling.AutoScalingGroup(self, "ue4-swarm-agent",
+        swarmasg = autoscaling.AutoScalingGroup(self, "ue5-swarm-agent",
             instance_type=ec2.InstanceType(agent_instancy_type),
             machine_image=swarmami,
             role=role,
             vpc=vpc,
-            vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType('PRIVATE')),
+            vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType('PRIVATE_WITH_NAT')),
             security_group=securitygroup,
             block_devices=[root_device],
             user_data=ec2.UserData.custom(agent_user_data),
@@ -224,6 +224,6 @@ class UnrealEngineSwarmClusterStack(core.Stack):
 
 
         # Output the AMI ID and Coordinator IP
-        core.CfnOutput(self, "UnrealEngine4SwarmAMI", value=swarmimage.attr_image_id,description="The AMI that is be used to deploy the Unreal Engine 4 Swarm Coordinator an the agents.")
+        core.CfnOutput(self, "UnrealEngine5SwarmAMI", value=swarmimage.attr_image_id,description="The AMI that is be used to deploy the Unreal Engine 5 Swarm Coordinator an the agents.")
 
-        core.CfnOutput(self, "UnrealEngine4SwarmCoordinatorPrivateIP",value=coordinator.instance_private_ip,description="The private IP of the Unreal Engine 4 Swam coordinator.")
+        core.CfnOutput(self, "UnrealEngine5SwarmCoordinatorPrivateIP",value=coordinator.instance_private_ip,description="The private IP of the Unreal Engine 5 Swam coordinator.")

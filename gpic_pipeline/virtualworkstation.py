@@ -42,7 +42,7 @@ class VirtualWorkstationStack(core.Stack):
     policy_document.add_statements(policy_statement_bucket_object_actions)
 
     # Instance Role and SSM Managed Policy
-    role = iam.Role(self, "VirutalWorkstationInstanceRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"), inline_policies=[policy_document])
+    role = iam.Role(self, "VirutalWorkstationInstanceRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"), inline_policies={"GPICDemo_VirtualWorkStationAccess" : policy_document})
 
     role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2RoleforSSM"))
     
@@ -58,7 +58,7 @@ class VirtualWorkstationStack(core.Stack):
     securitygroup = ec2.SecurityGroup(self, "Virtual-Workstation-SecurityGroup",
       vpc=vpc,
       security_group_name="Virtual-Workstation-SecurityGroup",
-      description="Allows remote access to the Virtual Workstation via RDP & Parsec, Teradici and NICE DCV. In addition allows UE4 Swarm communication",
+      description="Allows remote access to the Virtual Workstation via RDP & Parsec, HP Anyware, and NICE DCV. In addition allows UE5 Swarm communication",
       allow_all_outbound=True
       )
     

@@ -33,7 +33,7 @@ $developeroptions = $developeroptions.replace("REMOTECORES", $cores)
 $developeroptions = $developeroptions.replace("LOCALCORES", $cores-1)
 
 # Save the configureation file
-$developeroptions | Out-File -FilePath "C:\ue4-swarm\SwarmAgent.DeveloperOptions.xml"
+$developeroptions | Out-File -FilePath "C:\ue5-swarm\SwarmAgent.DeveloperOptions.xml"
 
 # Template of the Swarm Options file
 $agentoptions = '<?xml version="1.0"?>
@@ -68,10 +68,10 @@ $agentoptions = '<?xml version="1.0"?>
     <SerialisableColour LocalColour="-16777216" />
   </SerialisableColours>
   <AllowedRemoteAgentNames>*</AllowedRemoteAgentNames>
-  <AllowedRemoteAgentGroup>ue4-swarm-aws</AllowedRemoteAgentGroup>
-  <AgentGroupName>ue4-swarm-aws</AgentGroupName>
+  <AllowedRemoteAgentGroup>ue5-swarm-aws</AllowedRemoteAgentGroup>
+  <AgentGroupName>ue5-swarm-aws</AgentGroupName>
   <CoordinatorRemotingHost>COORDINATORHOST</CoordinatorRemotingHost>
-  <CacheFolder>C:\ue4-swarm/SwarmCache</CacheFolder>
+  <CacheFolder>C:\ue5-swarm/SwarmCache</CacheFolder>
   <MaximumJobsToKeep>5</MaximumJobsToKeep>
   <BringToFront>false</BringToFront>
   <ShowDeveloperMenu>true</ShowDeveloperMenu>
@@ -92,12 +92,12 @@ $agentoptions = '<?xml version="1.0"?>
 $agentoptions = $agentoptions.replace("COORDINATORHOST", $coordinator_ip)
 
 # Save the configuration file
-$agentoptions | Out-File -FilePath "C:\ue4-swarm\SwarmAgent.Options.xml"
+$agentoptions | Out-File -FilePath "C:\ue5-swarm\SwarmAgent.Options.xml"
 
 # Define the Swarm agent as Scheduled Task that starts at instance boot
-$action = New-ScheduledTaskAction -Execute "C:\ue4-swarm\SwarmAgent.exe"
+$action = New-ScheduledTaskAction -Execute "C:\ue5-swarm\SwarmAgent.exe"
 $trigger = New-ScheduledTaskTrigger -AtStartup
-Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmAgent" -Description "UE4 Swarm Agent" -RunLevel Highest
+Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmAgent" -Description "UE5 Swarm Agent" -RunLevel Highest
 
 # Restart the instance to trigger the Swarm Agent Scheduled Task
 Restart-Computer

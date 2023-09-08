@@ -81,7 +81,7 @@ class PerforceHelixCoreStack(core.Stack):
 
     depot_volume_type = self.get_volume_type_from_string(depot_volume_type)
     if depot_volume_type is None:
-      depot_volume_type = autoscaling.EbsDeviceVolumeType.ST1
+      depot_volume_type = ec2.EbsDeviceVolumeType.ST1
 
   
     depot_block_device = ec2.BlockDevice(
@@ -163,7 +163,7 @@ class PerforceHelixCoreStack(core.Stack):
       instance_type=ec2.InstanceType(instance_type),
       machine_image=linux_image,
       vpc = vpc,
-      vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType('PRIVATE')),
+      vpc_subnets = ec2.SubnetSelection(subnet_type=ec2.SubnetType('PRIVATE_WITH_NAT')),
       role = role,
       security_group=securitygroup,
       block_devices=[depot_block_device, log_block_device,metadata_block_device],
@@ -184,19 +184,19 @@ class PerforceHelixCoreStack(core.Stack):
       return None
     
     if volume_string.lower() == "gp2":
-      return autoscaling.EbsDeviceVolumeType.GP2
+      return ec2.EbsDeviceVolumeType.GP2
     elif volume_string.lower() == "gp3":
-      return autoscaling.EbsDeviceVolumeType.GP3
+      return ec2.EbsDeviceVolumeType.GP3
     elif volume_string.lower() == "io1":
-      return autoscaling.EbsDeviceVolumeType.IO1
+      return ec2.EbsDeviceVolumeType.IO1
     elif volume_string.lower() == "st1":
-      return autoscaling.EbsDeviceVolumeType.ST1
+      return ec2.EbsDeviceVolumeType.ST1
     elif volume_string.lower() == "sc1":
-      return autoscaling.EbsDeviceVolumeType.SC1
+      return ec2.EbsDeviceVolumeType.SC1
     elif volume_string.lower() == "standard":
-      return autoscaling.EbsDeviceVolumeType.STANDARD
+      return ec2.EbsDeviceVolumeType.STANDARD
     elif volume_string.lower() == "io2":
-      return autoscaling.EbsDeviceVolumeType.IO2
+      return ec2.EbsDeviceVolumeType.IO2
     else:
        return None
 
