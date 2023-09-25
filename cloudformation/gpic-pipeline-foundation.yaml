@@ -20,13 +20,13 @@ Resources:
   VPCPublicSubnet1SubnetB4246D30:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 10.0.0.0/18
       VpcId:
         Ref: VPCB9E5F0B4
       AvailabilityZone:
         Fn::Select:
           - 0
           - Fn::GetAZs: ""
+      CidrBlock: 10.0.0.0/18
       MapPublicIpOnLaunch: true
       Tags:
         - Key: aws-cdk:subnet-name
@@ -94,13 +94,13 @@ Resources:
   VPCPublicSubnet2Subnet74179F39:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 10.0.64.0/18
       VpcId:
         Ref: VPCB9E5F0B4
       AvailabilityZone:
         Fn::Select:
           - 1
           - Fn::GetAZs: ""
+      CidrBlock: 10.0.64.0/18
       MapPublicIpOnLaunch: true
       Tags:
         - Key: aws-cdk:subnet-name
@@ -145,13 +145,13 @@ Resources:
   VPCPrivateSubnet1Subnet8BCA10E0:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 10.0.128.0/18
       VpcId:
         Ref: VPCB9E5F0B4
       AvailabilityZone:
         Fn::Select:
           - 0
           - Fn::GetAZs: ""
+      CidrBlock: 10.0.128.0/18
       MapPublicIpOnLaunch: false
       Tags:
         - Key: aws-cdk:subnet-name
@@ -194,13 +194,13 @@ Resources:
   VPCPrivateSubnet2SubnetCFCDAA7A:
     Type: AWS::EC2::Subnet
     Properties:
-      CidrBlock: 10.0.192.0/18
       VpcId:
         Ref: VPCB9E5F0B4
       AvailabilityZone:
         Fn::Select:
           - 1
           - Fn::GetAZs: ""
+      CidrBlock: 10.0.192.0/18
       MapPublicIpOnLaunch: false
       Tags:
         - Key: aws-cdk:subnet-name
@@ -260,7 +260,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/0WPzY7CMAyEn4V7CH8SEreFCiEuEBXEPfUaNRQSlNggFOXdabawPc3n8diyJ3Iyncvx4Ec/wxB+m1EE51HGA2loROFsIM9AosTg2AOK4mz3THemTF83iTwew0zGFUODf82OkkCYyni6Q/ZOqhCKq6uBA1e2y/VUOiY86uqKvd97yxAcGE3G2f9whvVWZdlp2mjCp34J5c2jxX7x1hL6lr+B7pJPtaT21/qGllJKQr2odnY0kws5H1yCMUPPlswNZdnpG4XJLIIyAQAA
+      Analytics: v2:deflate64:H4sIAAAAAAAA/0WPzY7CMAyEn4V7CL8XbgsVQlwgKoh76jVqKCQosUEoyrtvQ2F78ueZsWVP5HQ8l+PBj36GIfw2owjOo4wH0tCIEoNjDyiKs90z3ZlE4Wwgz0BZ+/pJ5PEYZjKuGBp8mx0lgTCV8XSHrJ1UIRRXVwMHrmyX66l0THjU1RV7vdeWITgwmoyz/+EM663KZadpowmf+iWUN48W+8VbS+hb/ga6Sz7dktpf6xtaSikJ9aLa2dFMLuRkcAnGDD1bMjeUZVf/AELh+K0yAQAA
     Metadata:
       aws:cdk:path: gpic-pipeline-foundation/CDKMetadata/Default
 Outputs:

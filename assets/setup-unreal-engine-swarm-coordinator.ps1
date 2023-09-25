@@ -10,9 +10,9 @@ $admin_password_secure_string = $admin_password_plaintext | ConvertTo-SecureStri
 Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $admin_password_secure_string
 
 # Define the Swarm Coordinator to start as a Scheduled task at startup
-$action = New-ScheduledTaskAction -Execute "C:\ue4-swarm\SwarmCoordinator.exe"
+$action = New-ScheduledTaskAction -Execute "C:\ue5-swarm\SwarmCoordinator.exe"
 $trigger = New-ScheduledTaskTrigger -AtStartup
-Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmCoordinator" -Description "UE4 Swarm Coordinator" -RunLevel Highest -AsJob
+Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmCoordinator" -Description "UE5 Swarm Coordinator" -RunLevel Highest -AsJob
 
 # Restart the instance to trigger the Schedule task.
 Restart-Computer

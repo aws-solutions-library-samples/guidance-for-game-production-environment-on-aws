@@ -31,7 +31,7 @@ Resources:
                     - - Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputFnGetAttgpicpipelinebucket6D2579DDArnC5C75313
                       - /*
             Version: "2012-10-17"
-          PolicyName: "0"
+          PolicyName: GPICDemo_UESwarmAccess
     Metadata:
       aws:cdk:path: gpic-pipeline-swarm-cluster/SwarmInstanceRole/Resource
   SwarmInstanceRoleDefaultPolicy939A4DEF:
@@ -56,15 +56,15 @@ Resources:
     Properties:
       Roles:
         - Ref: SwarmInstanceRole6BCAB0C0
-      InstanceProfileName: ue4-swarm-instance-profile
+      InstanceProfileName: ue5-swarm-instance-profile
       Path: /executionServiceEC2Role/
     Metadata:
       aws:cdk:path: gpic-pipeline-swarm-cluster/GpicSwarmInstanceProfile
-  UE4SwarmSecurityGroup39071127:
+  UE5SwarmSecurityGroup58BC7F66:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security Group for UE4 Swarm Agent and Coordinator
-      GroupName: Allow UE4 Swarm communication
+      GroupDescription: Security Group for UE5 Swarm Agent and Coordinator
+      GroupName: Allow UE5 Swarm communication
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           Description: Allow all outbound traffic by default
@@ -88,8 +88,8 @@ Resources:
       VpcId:
         Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCB9E5F0B4BD23A326
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/UE4-Swarm-SecurityGroup/Resource
-  UE4SwarmSecurityGroupfromgpicpipelineswarmclusterUE4SwarmSecurityGroupB747559280088009B900479E:
+      aws:cdk:path: gpic-pipeline-swarm-cluster/UE5-Swarm-SecurityGroup/Resource
+  UE5SwarmSecurityGroupfromgpicpipelineswarmclusterUE5SwarmSecurityGroup78930DA180088009188E7E3A:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       IpProtocol: tcp
@@ -97,16 +97,16 @@ Resources:
       FromPort: 8008
       GroupId:
         Fn::GetAtt:
-          - UE4SwarmSecurityGroup39071127
+          - UE5SwarmSecurityGroup58BC7F66
           - GroupId
       SourceSecurityGroupId:
         Fn::GetAtt:
-          - UE4SwarmSecurityGroup39071127
+          - UE5SwarmSecurityGroup58BC7F66
           - GroupId
       ToPort: 8009
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/UE4-Swarm-SecurityGroup/from gpicpipelineswarmclusterUE4SwarmSecurityGroupB7475592:8008-8009
-  UE4SwarmSecurityGroupfromgpicpipelineswarmclusterUE4SwarmSecurityGroupB7475592ICMPType8198A9E66:
+      aws:cdk:path: gpic-pipeline-swarm-cluster/UE5-Swarm-SecurityGroup/from gpicpipelineswarmclusterUE5SwarmSecurityGroup78930DA1:8008-8009
+  UE5SwarmSecurityGroupfromgpicpipelineswarmclusterUE5SwarmSecurityGroup78930DA1ICMPType88DDD4ADF:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       IpProtocol: icmp
@@ -114,15 +114,15 @@ Resources:
       FromPort: 8
       GroupId:
         Fn::GetAtt:
-          - UE4SwarmSecurityGroup39071127
+          - UE5SwarmSecurityGroup58BC7F66
           - GroupId
       SourceSecurityGroupId:
         Fn::GetAtt:
-          - UE4SwarmSecurityGroup39071127
+          - UE5SwarmSecurityGroup58BC7F66
           - GroupId
       ToPort: -1
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/UE4-Swarm-SecurityGroup/from gpicpipelineswarmclusterUE4SwarmSecurityGroupB7475592:ICMP Type 8
+      aws:cdk:path: gpic-pipeline-swarm-cluster/UE5-Swarm-SecurityGroup/from gpicpipelineswarmclusterUE5SwarmSecurityGroup78930DA1:ICMP Type 8
   SwarmComponent:
     Type: AWS::ImageBuilder::Component
     Properties:
@@ -132,13 +132,10 @@ Resources:
       Data:
         Fn::Join:
           - ""
-          - - >-
-              name: InstallUE4Swarm
-
-              description: This component installs UE4 Swarm from S3 archive and also installs all prerequirements for a build.
-
+          - - |-
+              name: InstallUE5Swarm
+              description: This component installs UE5 Swarm from S3 archive and also installs all prerequirements for a build.
               schemaVersion: 1.0
-
 
               phases:
                 - name: build
@@ -146,29 +143,29 @@ Resources:
                     - name: CreateTempFolder
                       action: CreateFolder
                       inputs:
-                        - path: C:\ue4-swarm-temp
+                        - path: C:\ue5-swarm-temp
                     - name: DownloadDependencies
                       action: S3Download
                       maxAttempts: 3
                       inputs:
                         - source: s3://
             - Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefgpicpipelinebucket6D2579DDA0504931
-            - >
-              /ue4-swarm-archive.zip
-                          destination: C:\ue4-swarm-temp\ue4-swarm-archive.zip
+            - |
+              /ue5-swarm-archive.zip
+                          destination: C:\ue5-swarm-temp\ue5-swarm-archive.zip
                     - name: CreateSwarmFolder
                       action: CreateFolder
                       inputs:
-                        - path: C:\ue4-swarm
+                        - path: C:\ue5-swarm
                     - name: UncompressSwarmFiles
                       action: ExecutePowerShell
                       inputs:
                         commands:
-                          - Expand-Archive -LiteralPath C:\ue4-swarm-temp\ue4-swarm-archive.zip -DestinationPath C:\ue4-swarm
+                          - Expand-Archive -LiteralPath C:\ue5-swarm-temp\ue5-swarm-archive.zip -DestinationPath C:\ue5-swarm
                     - name: DeleteTempFolder
                       action: DeleteFolder
                       inputs:
-                        - path: C:\ue4-swarm-temp
+                        - path: C:\ue5-swarm-temp
                           force: true
                     - name: InstallDotNet
                       action: ExecutePowerShell
@@ -179,26 +176,26 @@ Resources:
                       action: ExecutePowerShell
                       inputs:
                         commands:
-                          - Start-Process -Wait -FilePath "C:\ue4-swarm\UE4PrereqSetup_x64.exe" -ArgumentList "/install /quiet"
+                          - Start-Process -Wait -FilePath "C:\ue5-swarm\UEPrereqSetup_x64.exe" -ArgumentList "/install /quiet"
                     - name: OpenFirewall
                       action: ExecutePowerShell
                       inputs:
                         commands:
-                          - New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
-                          - New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
+                          - New-NetFirewallRule -DisplayName 'Allow UE5 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
+                          - New-NetFirewallRule -DisplayName 'Allow UE5 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
                           - New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4
     Metadata:
       aws:cdk:path: gpic-pipeline-swarm-cluster/SwarmComponent
   SwarmInfraConfig:
     Type: AWS::ImageBuilder::InfrastructureConfiguration
     Properties:
-      InstanceProfileName: ue4-swarm-instance-profile
-      Name: GPIC-UE4-Swarm-WindowsServer-2019-Infra-Config
+      InstanceProfileName: ue5-swarm-instance-profile
+      Name: GPIC-UE5-Swarm-WindowsServer-2019-Infra-Config
       InstanceTypes:
         - m5.large
       SecurityGroupIds:
         - Fn::GetAtt:
-            - UE4SwarmSecurityGroup39071127
+            - UE5SwarmSecurityGroup58BC7F66
             - GroupId
       SubnetId:
         Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCPrivateSubnet1Subnet8BCA10E01F79A1B7
@@ -214,7 +211,7 @@ Resources:
             Fn::GetAtt:
               - SwarmComponent
               - Arn
-      Name: GPIC-UE4-Swarm-Image
+      Name: GPIC-UE5-Swarm-Image
       ParentImage:
         Ref: SsmParameterValueawsserviceamiwindowslatestWindowsServer2019EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter
       Version: 1.0.0
@@ -237,16 +234,18 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       GenerateSecretString: {}
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Metadata:
       aws:cdk:path: gpic-pipeline-swarm-cluster/Unreal Engine Swarm Instances password/Resource
-  ue4swarmcoordinatorInstanceProfile1A74E600:
+  ue5swarmcoordinatorInstanceProfile6BA76DE6:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
         - Ref: SwarmInstanceRole6BCAB0C0
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/ue4-swarm-coordinator/InstanceProfile
-  ue4swarmcoordinator743D2823:
+      aws:cdk:path: gpic-pipeline-swarm-cluster/ue5-swarm-coordinator/InstanceProfile
+  ue5swarmcoordinatorF31E1DFE:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone:
@@ -254,7 +253,7 @@ Resources:
           - 0
           - Fn::GetAZs: ""
       IamInstanceProfile:
-        Ref: ue4swarmcoordinatorInstanceProfile1A74E600
+        Ref: ue5swarmcoordinatorInstanceProfile6BA76DE6
       ImageId:
         Fn::GetAtt:
           - UnrealEngineSwarmImage
@@ -262,66 +261,53 @@ Resources:
       InstanceType: t3.large
       SecurityGroupIds:
         - Fn::GetAtt:
-            - UE4SwarmSecurityGroup39071127
+            - UE5SwarmSecurityGroup58BC7F66
             - GroupId
       SubnetId:
         Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCPrivateSubnet1Subnet8BCA10E01F79A1B7
       Tags:
         - Key: Name
-          Value: gpic-pipeline-swarm-cluster/ue4-swarm-coordinator
+          Value: gpic-pipeline-swarm-cluster/ue5-swarm-coordinator
       UserData:
         Fn::Base64:
           Fn::Join:
             - ""
-            - - >-
+            - - |-
                 <powershell>
-
                 ## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
                 ## SPDX-License-Identifier: MIT-0
 
-
                 # Get Administrator password from AWS Secrets Manager
-
                 $admin_password_plaintext = Get-SECSecretValue 
               - Ref: UnrealEngineSwarmInstancespassword695BA7B3
-              - >-2
+              - |-2
                  | % { Echo $_.SecretString} 
                 $admin_password_secure_string = $admin_password_plaintext | ConvertTo-SecureString -AsPlainText -Force
 
-
                 # Set Administrator password 
-
                 Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $admin_password_secure_string
 
-
                 # Define the Swarm Coordinator to start as a Scheduled task at startup
-
-                $action = New-ScheduledTaskAction -Execute "C:\ue4-swarm\SwarmCoordinator.exe"
-
+                $action = New-ScheduledTaskAction -Execute "C:\ue5-swarm\SwarmCoordinator.exe"
                 $trigger = New-ScheduledTaskTrigger -AtStartup
-
-                Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmCoordinator" -Description "UE4 Swarm Coordinator" -RunLevel Highest -AsJob
-
+                Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmCoordinator" -Description "UE5 Swarm Coordinator" -RunLevel Highest -AsJob
 
                 # Restart the instance to trigger the Schedule task.
-
                 Restart-Computer
-
                 </powershell>
     DependsOn:
       - SwarmInstanceRoleDefaultPolicy939A4DEF
       - SwarmInstanceRole6BCAB0C0
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/ue4-swarm-coordinator/Resource
-  ue4swarmagentInstanceProfileE2056578:
+      aws:cdk:path: gpic-pipeline-swarm-cluster/ue5-swarm-coordinator/Resource
+  ue5swarmagentInstanceProfileCE81A3E4:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
         - Ref: SwarmInstanceRole6BCAB0C0
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/ue4-swarm-agent/InstanceProfile
-  ue4swarmagentLaunchConfigC9C7E35F:
+      aws:cdk:path: gpic-pipeline-swarm-cluster/ue5-swarm-agent/InstanceProfile
+  ue5swarmagentLaunchConfig92C91706:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       ImageId:
@@ -335,52 +321,41 @@ Resources:
             DeleteOnTermination: true
             VolumeSize: 100
       IamInstanceProfile:
-        Ref: ue4swarmagentInstanceProfileE2056578
+        Ref: ue5swarmagentInstanceProfileCE81A3E4
       SecurityGroups:
         - Fn::GetAtt:
-            - UE4SwarmSecurityGroup39071127
+            - UE5SwarmSecurityGroup58BC7F66
             - GroupId
       UserData:
         Fn::Base64:
           Fn::Join:
             - ""
-            - - >-
+            - - |-
                 <powershell>
-
                 ## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
                 ## SPDX-License-Identifier: MIT-0
-
 
                 # Get Administrator password from AWS Secrets Manager
 
-
                 $admin_password_plaintext = Get-SECSecretValue 
               - Ref: UnrealEngineSwarmInstancespassword695BA7B3
-              - >-2
+              - |-2
                  | % { Echo $_.SecretString} 
                 $admin_password_secure_string = $admin_password_plaintext | ConvertTo-SecureString -AsPlainText -Force
 
-
                 # Set Administrator password 
-
                 Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $admin_password_secure_string
 
-
                 # Define Coordinator IP, Cloudformation replaces this when task is been created
-
                 $coordinator_ip = "
               - Fn::GetAtt:
-                  - ue4swarmcoordinator743D2823
+                  - ue5swarmcoordinatorF31E1DFE
                   - PrivateIp
-              - >-
+              - |-
                 "
 
-
                 # Template of the Swarm Agent Developper Options file
-
                 $developeroptions = '<?xml version="1.0"?>
-
                 <SettableDeveloperOptions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                   <LocalEnableLocalPerformanceMonitoring>true</LocalEnableLocalPerformanceMonitoring>
                   <LocalJobsDefaultProcessorCount>LOCALCORES</LocalJobsDefaultProcessorCount>
@@ -391,28 +366,18 @@ Resources:
                   <OptionsVersion>15</OptionsVersion>
                 </SettableDeveloperOptions>'
 
-
                 # Calculate number of cores
-
                 $cores = (Get-WmiObject -Class Win32_Processor | Select-Object -Property NumberOfLogicalProcessors).NumberOfLogicalProcessors
 
-
                 # Set the core values for the Swarm Agent
-
                 $developeroptions = $developeroptions.replace("REMOTECORES", $cores)
-
                 $developeroptions = $developeroptions.replace("LOCALCORES", $cores-1)
 
-
                 # Save the configureation file
-
-                $developeroptions | Out-File -FilePath "C:\ue4-swarm\SwarmAgent.DeveloperOptions.xml"
-
+                $developeroptions | Out-File -FilePath "C:\ue5-swarm\SwarmAgent.DeveloperOptions.xml"
 
                 # Template of the Swarm Options file
-
                 $agentoptions = '<?xml version="1.0"?>
-
                 <SettableOptions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                   <SerialisableColours>
                     <SerialisableColour LocalColour="-1" />
@@ -444,10 +409,10 @@ Resources:
                     <SerialisableColour LocalColour="-16777216" />
                   </SerialisableColours>
                   <AllowedRemoteAgentNames>*</AllowedRemoteAgentNames>
-                  <AllowedRemoteAgentGroup>ue4-swarm-aws</AllowedRemoteAgentGroup>
-                  <AgentGroupName>ue4-swarm-aws</AgentGroupName>
+                  <AllowedRemoteAgentGroup>ue5-swarm-aws</AllowedRemoteAgentGroup>
+                  <AgentGroupName>ue5-swarm-aws</AgentGroupName>
                   <CoordinatorRemotingHost>COORDINATORHOST</CoordinatorRemotingHost>
-                  <CacheFolder>C:\ue4-swarm/SwarmCache</CacheFolder>
+                  <CacheFolder>C:\ue5-swarm/SwarmCache</CacheFolder>
                   <MaximumJobsToKeep>5</MaximumJobsToKeep>
                   <BringToFront>false</BringToFront>
                   <ShowDeveloperMenu>true</ShowDeveloperMenu>
@@ -464,48 +429,37 @@ Resources:
                   <VisualiserZoomLevel>4</VisualiserZoomLevel>
                 </SettableOptions>'
 
-
                 # Replace the Coordinator IP in the template
-
                 $agentoptions = $agentoptions.replace("COORDINATORHOST", $coordinator_ip)
 
-
                 # Save the configuration file
-
-                $agentoptions | Out-File -FilePath "C:\ue4-swarm\SwarmAgent.Options.xml"
-
+                $agentoptions | Out-File -FilePath "C:\ue5-swarm\SwarmAgent.Options.xml"
 
                 # Define the Swarm agent as Scheduled Task that starts at instance boot
-
-                $action = New-ScheduledTaskAction -Execute "C:\ue4-swarm\SwarmAgent.exe"
-
+                $action = New-ScheduledTaskAction -Execute "C:\ue5-swarm\SwarmAgent.exe"
                 $trigger = New-ScheduledTaskTrigger -AtStartup
-
-                Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmAgent" -Description "UE4 Swarm Agent" -RunLevel Highest
-
+                Register-ScheduledTask -Action $action -Trigger $trigger -User "Administrator" -Password $admin_password_plaintext -TaskName "SwarmAgent" -Description "UE5 Swarm Agent" -RunLevel Highest
 
                 # Restart the instance to trigger the Swarm Agent Scheduled Task
-
                 Restart-Computer
-
                 </powershell>
     DependsOn:
       - SwarmInstanceRoleDefaultPolicy939A4DEF
       - SwarmInstanceRole6BCAB0C0
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/ue4-swarm-agent/LaunchConfig
-  ue4swarmagentASG86631DEA:
+      aws:cdk:path: gpic-pipeline-swarm-cluster/ue5-swarm-agent/LaunchConfig
+  ue5swarmagentASGD632CDF3:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       MaxSize: "1"
       MinSize: "1"
       DesiredCapacity: "1"
       LaunchConfigurationName:
-        Ref: ue4swarmagentLaunchConfigC9C7E35F
+        Ref: ue5swarmagentLaunchConfig92C91706
       Tags:
         - Key: Name
           PropagateAtLaunch: true
-          Value: gpic-pipeline-swarm-cluster/ue4-swarm-agent
+          Value: gpic-pipeline-swarm-cluster/ue5-swarm-agent
       VPCZoneIdentifier:
         - Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCPrivateSubnet1Subnet8BCA10E01F79A1B7
         - Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputRefVPCPrivateSubnet2SubnetCFCDAA7AB22CF85D
@@ -513,11 +467,11 @@ Resources:
       AutoScalingScheduledAction:
         IgnoreUnmodifiedGroupSizeProperties: true
     Metadata:
-      aws:cdk:path: gpic-pipeline-swarm-cluster/ue4-swarm-agent/ASG
+      aws:cdk:path: gpic-pipeline-swarm-cluster/ue5-swarm-agent/ASG
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Modules: aws-cdk=1.91.0,@aws-cdk/assets=1.92.0,@aws-cdk/aws-applicationautoscaling=1.92.0,@aws-cdk/aws-autoscaling=1.92.0,@aws-cdk/aws-autoscaling-common=1.92.0,@aws-cdk/aws-certificatemanager=1.92.0,@aws-cdk/aws-cloudformation=1.92.0,@aws-cdk/aws-cloudwatch=1.92.0,@aws-cdk/aws-codeguruprofiler=1.92.0,@aws-cdk/aws-ec2=1.92.0,@aws-cdk/aws-ecr=1.92.0,@aws-cdk/aws-ecr-assets=1.92.0,@aws-cdk/aws-efs=1.92.0,@aws-cdk/aws-elasticloadbalancing=1.92.0,@aws-cdk/aws-elasticloadbalancingv2=1.92.0,@aws-cdk/aws-events=1.92.0,@aws-cdk/aws-iam=1.92.0,@aws-cdk/aws-imagebuilder=1.92.0,@aws-cdk/aws-kms=1.92.0,@aws-cdk/aws-lambda=1.92.0,@aws-cdk/aws-logs=1.92.0,@aws-cdk/aws-route53=1.92.0,@aws-cdk/aws-s3=1.92.0,@aws-cdk/aws-s3-assets=1.92.0,@aws-cdk/aws-sam=1.92.0,@aws-cdk/aws-secretsmanager=1.92.0,@aws-cdk/aws-signer=1.92.0,@aws-cdk/aws-sns=1.92.0,@aws-cdk/aws-sqs=1.92.0,@aws-cdk/aws-ssm=1.92.0,@aws-cdk/cloud-assembly-schema=1.92.0,@aws-cdk/core=1.92.0,@aws-cdk/custom-resources=1.92.0,@aws-cdk/cx-api=1.92.0,@aws-cdk/region-info=1.92.0,jsii-runtime=Python/3.9.5
+      Analytics: v2:deflate64:H4sIAAAAAAAA/31Q207DMAz9lr1n2QVeeAPtAU2aRNV9QfDczqxJKscRqqL8O2nLKgQST/Y5Pj6+7PR++6i3q2fzGdZwuW0SeEadzmLgpg6Nqwwbi4Ksagw+MuDIvkXpo6iDd0E4gozcvZ7V6JXIWJ1q3036KVa+Ixgm0yU7FgPjACv2DXWlF2FfpiNEJhle2cd+lP1PHF3LGIK6m/00zoqsafE9UndB1qmUDt723qGTWdewmY+IjOWghtrIRsi7qTw21wjU4wKzCgiMEqxxBfK0b8Hfe5WsvCCKD2A6cq1OLwWcZ7AccDLRwfXPvN/SnLOqBrl6t3nQT3q3+ghEa45OyKKu5/gFFxhE/cUBAAA=
     Metadata:
       aws:cdk:path: gpic-pipeline-swarm-cluster/CDKMetadata/Default
 Parameters:
@@ -525,16 +479,16 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 Outputs:
-  UnrealEngine4SwarmAMI:
-    Description: The AMI that is be used to deploy the Unreal Engine 4 Swarm Coordinator an the agents.
+  UnrealEngine5SwarmAMI:
+    Description: The AMI that is be used to deploy the Unreal Engine 5 Swarm Coordinator an the agents.
     Value:
       Fn::GetAtt:
         - UnrealEngineSwarmImage
         - ImageId
-  UnrealEngine4SwarmCoordinatorPrivateIP:
-    Description: The private IP of the Unreal Engine 4 Swam coordinator.
+  UnrealEngine5SwarmCoordinatorPrivateIP:
+    Description: The private IP of the Unreal Engine 5 Swam coordinator.
     Value:
       Fn::GetAtt:
-        - ue4swarmcoordinator743D2823
+        - ue5swarmcoordinatorF31E1DFE
         - PrivateIp
 

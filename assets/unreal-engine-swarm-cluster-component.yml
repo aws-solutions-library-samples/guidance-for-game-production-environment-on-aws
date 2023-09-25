@@ -1,5 +1,5 @@
-name: InstallUE4Swarm
-description: This component installs UE4 Swarm from S3 archive and also installs all prerequirements for a build.
+name: InstallUE5Swarm
+description: This component installs UE5 Swarm from S3 archive and also installs all prerequirements for a build.
 schemaVersion: 1.0
 
 phases:
@@ -8,26 +8,26 @@ phases:
       - name: CreateTempFolder
         action: CreateFolder
         inputs:
-          - path: C:\ue4-swarm-temp
+          - path: C:\ue5-swarm-temp
       - name: DownloadDependencies
         action: S3Download
         maxAttempts: 3
         inputs:
-          - source: s3://S3-BUCKET-NAME/ue4-swarm-archive.zip
-            destination: C:\ue4-swarm-temp\ue4-swarm-archive.zip
+          - source: s3://S3-BUCKET-NAME/ue5-swarm-archive.zip
+            destination: C:\ue5-swarm-temp\ue5-swarm-archive.zip
       - name: CreateSwarmFolder
         action: CreateFolder
         inputs:
-          - path: C:\ue4-swarm
+          - path: C:\ue5-swarm
       - name: UncompressSwarmFiles
         action: ExecutePowerShell
         inputs:
           commands:
-            - Expand-Archive -LiteralPath C:\ue4-swarm-temp\ue4-swarm-archive.zip -DestinationPath C:\ue4-swarm
+            - Expand-Archive -LiteralPath C:\ue5-swarm-temp\ue5-swarm-archive.zip -DestinationPath C:\ue5-swarm
       - name: DeleteTempFolder
         action: DeleteFolder
         inputs:
-          - path: C:\ue4-swarm-temp
+          - path: C:\ue5-swarm-temp
             force: true
       - name: InstallDotNet
         action: ExecutePowerShell
@@ -38,11 +38,11 @@ phases:
         action: ExecutePowerShell
         inputs:
           commands:
-            - Start-Process -Wait -FilePath "C:\ue4-swarm\UE4PrereqSetup_x64.exe" -ArgumentList "/install /quiet"
+            - Start-Process -Wait -FilePath "C:\ue5-swarm\UEPrereqSetup_x64.exe" -ArgumentList "/install /quiet"
       - name: OpenFirewall
         action: ExecutePowerShell
         inputs:
           commands:
-            - New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
-            - New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
+            - New-NetFirewallRule -DisplayName 'Allow UE5 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
+            - New-NetFirewallRule -DisplayName 'Allow UE5 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
             - New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4

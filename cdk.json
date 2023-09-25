@@ -1,5 +1,5 @@
 {
-  "app": "python app.py",
+  "app": "python3 app.py",
   "context": {
     "@aws-cdk/core:enableStackNameDuplicates": "true",
     "aws-cdk:enableDiffNoFail": "true",
@@ -19,7 +19,7 @@
     "virtual_workstation_instance_type": "g4dn.4xlarge",
     "virtual_workstation_root_volume_size": 200,
 
-    "_comment_unreal_engine_swarm_cluster_stack": "Unreal Engine 4 Swarm Cluster Stack",
+    "_comment_unreal_engine_swarm_cluster_stack": "Unreal Engine 5 Swarm Cluster Stack",
 
     "unreal_engine_swarm_cluster_trusted_internal_cidr": "10.0.0.0/8",
     "unreal_engine_swarm_cluster_image_builder_instance_type": "m5.large",

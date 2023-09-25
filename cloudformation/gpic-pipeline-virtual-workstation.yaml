@@ -34,7 +34,7 @@ Resources:
                     - - Fn::ImportValue: gpic-pipeline-foundation:ExportsOutputFnGetAttgpicpipelinebucket6D2579DDArnC5C75313
                       - /*
             Version: "2012-10-17"
-          PolicyName: "0"
+          PolicyName: GPICDemo_VirtualWorkStationAccess
     Metadata:
       aws:cdk:path: gpic-pipeline-virtual-workstation/VirutalWorkstationInstanceRole/Resource
   VirutalWorkstationInstanceRoleDefaultPolicy687E981D:
@@ -58,12 +58,14 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       GenerateSecretString: {}
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Metadata:
       aws:cdk:path: gpic-pipeline-virtual-workstation/Virtual Workstation Password/Resource
   VirtualWorkstationSecurityGroup659745E6:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allows remote access to the Virtual Workstation via RDP & Parsec, Teradici and NICE DCV. In addition allows UE4 Swarm communication
+      GroupDescription: Allows remote access to the Virtual Workstation via RDP & Parsec, HP Anyware, and NICE DCV. In addition allows UE5 Swarm communication
       GroupName: Virtual-Workstation-SecurityGroup
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
@@ -181,8 +183,8 @@ Resources:
                 New-NetFirewallRule -DisplayName 'Allow PCoIP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8443
 
                 # Allow Unreal Engine Swarm coomunication
-                New-NetFirewallRule -DisplayName 'Allow UE4 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
-                New-NetFirewallRule -DisplayName 'Allow UE4 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
+                New-NetFirewallRule -DisplayName 'Allow UE5 Swarm TCP' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8008-8009
+                New-NetFirewallRule -DisplayName 'Allow UE5 Swarm UDP' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8008-8009
                 New-NetFirewallRule -DisplayName 'Allow ICMP' -Direction Inbound -Action Allow -Protocol ICMPv4
 
                 # Install NVIDIA Grid driver
@@ -229,7 +231,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/01OywrCMBD8Fu8x9QGCN6GI9GSoXxDWVaNtUjYbpJT8u01qxdPMzszO7lquNzu5Whz02y/h+ioGcIRyuLCGlyhvVmnSLTKSqNG7QIBJPQfuAovSWc8UgJM2+1GkrsHoVg61a3I+o3KNgT6X/lg1FmgLqMjdTDPuegRC9q22+o40PpLnFJ1YFAibLAcy3J/Ihe7r/glz7f+JxI+VijEK1fPD2WIr93K3eHpjlhQsmxZlPeEHD3gtIBcBAAA=
+      Analytics: v2:deflate64:H4sIAAAAAAAA/01OQQ7CMAx7C/dSGHDhhoQQ2olqvKAKGRS2dkpToWnq31k7QDvZsR0nhdysd3K9OOi3X8LttRrAEcrhyhpe4lhbpUm3yEiiQu8CASb1ErgLLI7OeqYAnLSfH0XqGoxu5VC5JuczKtcY6HPpn5VjgbaAilxtmnHXIxCyb7XVd6TxkTyn6MSiQNhkOZDh/kwudF93Jvxq5ycSP5UqxihUzw9nV1u5l8Xi6Y1ZUrBsWpTVhB+LkfuAFwEAAA==
     Metadata:
       aws:cdk:path: gpic-pipeline-virtual-workstation/CDKMetadata/Default
 Parameters:

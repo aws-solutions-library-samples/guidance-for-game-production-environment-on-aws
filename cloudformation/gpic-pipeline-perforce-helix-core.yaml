@@ -43,6 +43,8 @@ Resources:
         ExcludePunctuation: true
         IncludeSpace: false
         PasswordLength: 32
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
     Metadata:
       aws:cdk:path: gpic-pipeline-perforce-helix-core/Perforce Helix Core Password/Resource
   PerforceHelixCoreSecurityGroup922154AA:
@@ -258,7 +260,7 @@ Resources:
   CDKMetadata:
     Type: AWS::CDK::Metadata
     Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/01OQQ6CMBB8C/dSBBMTbyYcjCcbfEGzrlqB1my3MYT070JRw2lmZ2Znt5RltZOb7KDfPodrW4zgCOV4YQ2tqG9WadI9MpJo0LtAgLN6DvwKLGpnPVMAnrWfH8XcNRrdy7FxXconVK4zMKTSPztNBdoCKnI30027HoGQfa+tviNNj6R5ji4sCoQqyYEMD0dy4fV1V8Kvdn0ixijUwA9ni63cy1329MbkFCybHmWz4Afw4oUtEAEAAA==
+      Analytics: v2:deflate64:H4sIAAAAAAAA/01OQQ7CMAx7y+6lsMGFGxIHxIlpvKAKGZRtLUpToanq31k7QDvZsR0npaw2O7kpDurtVnDr1gEsoQxXVtCJY2tqRWpARhINOusJMKkXzy/P4miNY/LASfv5UaSuoNUgQ2P7nM9Y217DmEv/7DwVKANYk211P+06BEJ2gzLqjjQ9kucUnVkUCFWWPWkeT2T96+suhF/t8kSMUdQjP6xZb+VelsXTab0ib1gPKJsZP7n5nTkQAQAA
     Metadata:
       aws:cdk:path: gpic-pipeline-perforce-helix-core/CDKMetadata/Default
 Parameters:
