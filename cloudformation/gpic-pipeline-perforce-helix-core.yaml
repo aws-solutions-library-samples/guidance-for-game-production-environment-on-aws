@@ -1,3 +1,4 @@
+Description: Guidance for a Game Production Environment on AWS - Perforce Helix Core Stack (SO9329)
 Resources:
   PerforceHelixCoreInstanceRoleB352A600:
     Type: AWS::IAM::Role
