@@ -1,3 +1,4 @@
+Description: Guidance for a Game Production Environment on AWS - Virtual Workstation Stack (SO9329)
 Resources:
   VirutalWorkstationInstanceRole2E55B929:
     Type: AWS::IAM::Role

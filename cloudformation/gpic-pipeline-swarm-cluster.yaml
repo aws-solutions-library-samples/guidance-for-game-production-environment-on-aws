@@ -1,3 +1,4 @@
+Description: Guidance for a Game Production Environment on AWS - Unreal Engine Swarm Stack (SO9329)
 Resources:
   SwarmInstanceRole6BCAB0C0:
     Type: AWS::IAM::Role
